@@ -45,6 +45,7 @@ Do not start by building a fake viewport. Do not present Canvas/WebGL/Three.js p
 | `blueprint/` | Product architecture, planning, CI, deployment, auth/storage, QA, and agent handoff docs |
 | `CLAUDE.md` | Claude Code CLI working instructions |
 | `AGENTS.md` | General implementation-agent instructions |
+| `docs/devops/` | Issue, branch, PR, pipeline, and observability workflow |
 | `docs/handoff/` | Dated audit and next-step handoff |
 
 ## Start Here
@@ -56,7 +57,36 @@ blueprint/README.md
 docs/handoff/2026-08-08-claude-minimax-handoff.md
 CLAUDE.md
 AGENTS.md
+docs/devops/workflow-policy.md
 ```
+
+## Development Workflow
+
+All future work must use issue-driven development:
+
+```text
+issue/task -> branch -> commit -> validation -> PR -> review -> merge
+```
+
+Do not work directly on `master` for feature work. Branches must include the ticket or issue ID.
+
+Examples:
+
+```text
+feature/12-artifact-audit
+fix/18-missing-manifest-state
+docs/24-cloudflare-runbook
+build/31-cycles-ci-cache
+agent/42-storage-panel
+```
+
+Upstream pushing is disabled locally. The HeyPuter remote is fetch-only:
+
+```bash
+git remote set-url --push origin DISABLED_UPSTREAM_PUSH
+```
+
+Push feature branches to the user fork remote.
 
 ## Local Setup
 
@@ -148,12 +178,12 @@ Production demo URL: add to GitHub repository About section
 
 ## Fork Remote Setup
 
-This local clone currently needs its `origin` checked. If it still points at upstream, set your fork as origin and keep upstream separately:
+This local clone keeps HeyPuter as `origin` for fetch only and disables pushing to it. Use the user fork remote for branches and PRs.
 
 ```bash
-git remote rename origin upstream
-git remote add origin <your-fork-url>
-git fetch origin
+git remote -v
+git remote set-url --push origin DISABLED_UPSTREAM_PUSH
+git push backup HEAD:<branch-name>
 ```
 
 Do not push to upstream.
@@ -169,4 +199,3 @@ A task is complete only when:
 5. docs/build notes are updated;
 6. no fake Blender output is introduced;
 7. git diff is scoped.
-

@@ -8,6 +8,7 @@ const requiredFiles = [
   'AGENTS.md',
   'Makefile',
   'blueprint/README.md',
+  'docs/devops/workflow-policy.md',
   'docs/handoff/2026-08-08-claude-minimax-handoff.md',
   'docs/handoff/2026-08-08-audit.md',
   'demo/vite.config.js',
@@ -48,6 +49,18 @@ if (!pkg.scripts?.['audit:setup']) {
   failed = true;
 } else {
   console.log('OK package.json scripts.audit:setup');
+}
+
+try {
+  const gitConfig = readFileSync('.git/config', 'utf8');
+  if (!gitConfig.includes('pushurl = DISABLED_UPSTREAM_PUSH')) {
+    console.error('FAIL upstream origin push URL is not disabled. Run: git remote set-url --push origin DISABLED_UPSTREAM_PUSH');
+    failed = true;
+  } else {
+    console.log('OK upstream origin push URL disabled');
+  }
+} catch {
+  console.warn('WARN unable to inspect .git/config for upstream push URL');
 }
 
 if (failed) {

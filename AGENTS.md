@@ -6,6 +6,39 @@ This repo uses a HeyPuter Blender WASM fork plus a greenfield product blueprint.
 
 Build toward a real browser Blender runtime. The first honest milestone is a browser-visible render produced by real WASM runtime code.
 
+## DevOps Workflow
+
+Every unit of work requires an issue, ticket, or task before implementation.
+
+Required flow:
+
+```text
+issue/task -> feature branch -> implementation -> validation -> pull request -> review -> merge
+```
+
+Branch naming:
+
+```text
+feature/<ticket-id>-short-name
+fix/<ticket-id>-short-name
+docs/<ticket-id>-short-name
+build/<ticket-id>-short-name
+agent/<ticket-id>-short-name
+```
+
+Do not work directly on `master` except for emergency documentation/handoff commits explicitly requested by the owner.
+
+Every PR must reference its issue/task and include:
+
+- problem;
+- solution;
+- commands run;
+- screenshots or logs if UI/build behavior changed;
+- artifact sizes if artifacts changed;
+- risks and rollback.
+
+Upstream pushing is disabled. `origin` is HeyPuter upstream for fetch only. Push work to the user fork remote, currently named `backup` in this local clone unless renamed.
+
 ## Do Not Do This
 
 - Do not add a fake viewport.
@@ -49,7 +82,7 @@ Keep these current:
 ```text
 README.md
 CLAUDE.md
+docs/devops/
 docs/handoff/
 blueprint/
 ```
-

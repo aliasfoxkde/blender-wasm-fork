@@ -15,6 +15,7 @@ Before editing code, read:
 5. `blueprint/plans/21-agent-task-backlog.md`
 6. `blueprint/plans/22-first-week-execution-plan.md`
 7. `blueprint/agents/23-claude-minimax-workflow.md`
+8. `docs/devops/workflow-policy.md`
 
 ## Non-Negotiable Rules
 
@@ -25,6 +26,7 @@ Before editing code, read:
 5. Do not push to HeyPuter upstream.
 6. Keep upstream build harness changes small and documented.
 7. Prefer product work around artifact manifests/runtime adapters before changing full Blender build internals.
+8. Require an issue/task, feature branch, and PR for every new unit of work.
 
 ## Safe Local Commands
 
@@ -53,11 +55,13 @@ If asked to run one locally, confirm resource constraints and use limited jobs w
 Start with small, low-risk tasks:
 
 1. Verify fork remote setup.
-2. Keep blueprint docs current.
-3. Add artifact manifest audit tooling.
-4. Add product app shell states.
-5. Add missing-artifact tests.
-6. Only then work on build artifact integration.
+2. Create or identify the issue/task.
+3. Create a feature branch tied to the issue/task.
+4. Keep blueprint docs current.
+5. Add artifact manifest audit tooling.
+6. Add product app shell states.
+7. Add missing-artifact tests.
+8. Only then work on build artifact integration.
 
 ## Reporting Format
 

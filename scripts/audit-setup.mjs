@@ -53,14 +53,24 @@ if (!pkg.scripts?.['audit:setup']) {
 
 try {
   const gitConfig = readFileSync('.git/config', 'utf8');
-  if (!gitConfig.includes('pushurl = DISABLED_UPSTREAM_PUSH')) {
-    console.error('FAIL upstream origin push URL is not disabled. Run: git remote set-url --push origin DISABLED_UPSTREAM_PUSH');
+  if (!gitConfig.includes('[remote "upstream"]')) {
+    console.error('FAIL missing upstream remote for HeyPuter fetches');
+    failed = true;
+  } else if (!gitConfig.includes('pushurl = DISABLED_UPSTREAM_PUSH')) {
+    console.error('FAIL upstream push URL is not disabled. Run: git remote set-url --push upstream DISABLED_UPSTREAM_PUSH');
     failed = true;
   } else {
-    console.log('OK upstream origin push URL disabled');
+    console.log('OK upstream push URL disabled');
+  }
+
+  if (!gitConfig.includes('[remote "origin"]') || !gitConfig.includes('github.com/aliasfoxkde/blender-wasm-fork')) {
+    console.error('FAIL origin remote must point to the user fork: https://github.com/aliasfoxkde/blender-wasm-fork.git');
+    failed = true;
+  } else {
+    console.log('OK origin points to user fork');
   }
 } catch {
-  console.warn('WARN unable to inspect .git/config for upstream push URL');
+  console.warn('WARN unable to inspect .git/config for remote policy');
 }
 
 if (failed) {

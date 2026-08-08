@@ -59,12 +59,17 @@ Run:
 git remote -v
 ```
 
-If `origin` points to `https://github.com/HeyPuter/blender-wasm.git`, fix it:
+Expected:
+
+```text
+origin   https://github.com/aliasfoxkde/blender-wasm-fork.git
+upstream https://github.com/HeyPuter/blender-wasm.git fetch only
+```
+
+Keep upstream push disabled:
 
 ```bash
-git remote rename origin upstream
-git remote add origin <USER_FORK_URL>
-git fetch origin
+git remote set-url --push upstream DISABLED_UPSTREAM_PUSH
 ```
 
 Do not push to upstream.

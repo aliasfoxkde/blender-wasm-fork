@@ -37,7 +37,7 @@ Every PR must reference its issue/task and include:
 - artifact sizes if artifacts changed;
 - risks and rollback.
 
-Upstream pushing is disabled. `origin` is HeyPuter upstream for fetch only. Push work to the user fork remote, currently named `backup` in this local clone unless renamed.
+Upstream pushing is disabled. `origin` is the user fork. `upstream` is HeyPuter fetch-only and its push URL must stay set to `DISABLED_UPSTREAM_PUSH`.
 
 ## Do Not Do This
 

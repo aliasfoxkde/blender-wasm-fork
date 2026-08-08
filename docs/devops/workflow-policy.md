@@ -6,18 +6,21 @@ This repo requires issue-driven, branch-per-work development from this point for
 
 ## Remote Policy
 
-`origin` is reserved for HeyPuter upstream fetches.
+`origin` is the user fork.
 
-Pushing to `origin` must remain disabled:
+`upstream` is reserved for HeyPuter fetches.
+
+Pushing to `upstream` must remain disabled:
 
 ```bash
-git remote set-url --push origin DISABLED_UPSTREAM_PUSH
+git remote set-url --push upstream DISABLED_UPSTREAM_PUSH
 ```
 
-The user fork remote should be used for pushes. In this local clone it is currently:
+The expected remote layout is:
 
 ```text
-backup https://github.com/aliasfoxkde/blender-wasm.git
+origin   https://github.com/aliasfoxkde/blender-wasm-fork.git
+upstream https://github.com/HeyPuter/blender-wasm.git
 ```
 
 Check before every push:
@@ -168,4 +171,3 @@ The ticket must specify:
 - stop conditions.
 
 Claude Code or the owner reviews the result before merge.
-

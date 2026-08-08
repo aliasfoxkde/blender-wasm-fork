@@ -80,13 +80,20 @@ build/31-cycles-ci-cache
 agent/42-storage-panel
 ```
 
-Upstream pushing is disabled locally. The HeyPuter remote is fetch-only:
+Upstream pushing is disabled locally. The standard remote layout is:
 
-```bash
-git remote set-url --push origin DISABLED_UPSTREAM_PUSH
+```text
+origin   https://github.com/aliasfoxkde/blender-wasm-fork.git
+upstream https://github.com/HeyPuter/blender-wasm.git fetch only
 ```
 
-Push feature branches to the user fork remote.
+Keep upstream push disabled:
+
+```bash
+git remote set-url --push upstream DISABLED_UPSTREAM_PUSH
+```
+
+Push feature branches to `origin`.
 
 ## Local Setup
 
@@ -178,12 +185,12 @@ Production demo URL: add to GitHub repository About section
 
 ## Fork Remote Setup
 
-This local clone keeps HeyPuter as `origin` for fetch only and disables pushing to it. Use the user fork remote for branches and PRs.
+This local clone keeps your fork as `origin` and HeyPuter as fetch-only `upstream`.
 
 ```bash
 git remote -v
-git remote set-url --push origin DISABLED_UPSTREAM_PUSH
-git push backup HEAD:<branch-name>
+git remote set-url --push upstream DISABLED_UPSTREAM_PUSH
+git push origin HEAD:<branch-name>
 ```
 
 Do not push to upstream.

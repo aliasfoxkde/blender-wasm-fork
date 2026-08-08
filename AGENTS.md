@@ -50,6 +50,6 @@ Keep these current:
 README.md
 CLAUDE.md
 docs/handoff/
-greenfield-blender-wasm-blueprint/
+blueprint/
 ```
 

@@ -20,7 +20,7 @@ cmake/cycles-wasm-cache.cmake
 cmake/blender-wasm-cache.cmake
 demo/src/main.js
 demo/vite.config.js
-greenfield-blender-wasm-blueprint/
+blueprint/
 ```
 
 ## Current Strength
@@ -154,7 +154,8 @@ Run on a machine with enough RAM/disk/swap. Record:
 
 ## MiniMax Rules
 
-MiniMax should work from `greenfield-blender-wasm-blueprint/plans/21-agent-task-backlog.md` and complete small tickets only.
+MiniMax should work from `blueprint/plans/21-agent-task-backlog.md` and
+`blueprint/agents/23-claude-minimax-workflow.md`, completing small tickets only.
 
 Every MiniMax result must report:
 
@@ -165,4 +166,3 @@ Result:
 Known limitations:
 Next ticket:
 ```
-

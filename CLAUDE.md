@@ -2,7 +2,7 @@
 
 You are working in a fork of `https://github.com/HeyPuter/blender-wasm`.
 
-Primary objective: turn this fork into a product-grade browser Blender runtime project using the greenfield blueprint in `greenfield-blender-wasm-blueprint/`.
+Primary objective: turn this fork into a product-grade browser Blender runtime project using the blueprint in `blueprint/`.
 
 ## Read First
 
@@ -11,8 +11,10 @@ Before editing code, read:
 1. `README.md`
 2. `AGENTS.md`
 3. `docs/handoff/2026-08-08-claude-minimax-handoff.md`
-4. `greenfield-blender-wasm-blueprint/README.md`
-5. `greenfield-blender-wasm-blueprint/plans/21-agent-task-backlog.md`
+4. `blueprint/README.md`
+5. `blueprint/plans/21-agent-task-backlog.md`
+6. `blueprint/plans/22-first-week-execution-plan.md`
+7. `blueprint/agents/23-claude-minimax-workflow.md`
 
 ## Non-Negotiable Rules
 
@@ -69,4 +71,3 @@ Artifacts:
 Known limitations:
 Next step:
 ```
-

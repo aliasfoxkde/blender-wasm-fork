@@ -12,7 +12,7 @@ Tasks:
    Option B: create clean repo and vendor/adapt build harness.
    ```
 
-3. Add this blueprint under `docs/greenfield-blueprint/`.
+3. Add this blueprint under `blueprint/`.
 4. Add root `.gitignore`.
 5. Add root `README.md` explaining real-render-first strategy.
 

@@ -24,7 +24,7 @@ Steps:
 4. Add this blueprint under:
 
    ```text
-   docs/greenfield-blueprint/
+   blueprint/
    ```
 
 5. Create a branch:
@@ -46,7 +46,7 @@ Steps:
 3. Add this blueprint under:
 
    ```text
-   docs/greenfield-blueprint/
+   blueprint/
    ```
 
 4. Add app shell.

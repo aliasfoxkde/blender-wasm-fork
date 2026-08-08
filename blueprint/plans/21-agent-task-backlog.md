@@ -27,7 +27,7 @@ pnpm install
 Files:
 
 ```text
-docs/greenfield-blueprint/**
+blueprint/**
 ```
 
 Acceptance:

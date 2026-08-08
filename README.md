@@ -42,7 +42,7 @@ Do not start by building a fake viewport. Do not present Canvas/WebGL/Three.js p
 | `scripts/` | Dependency builders, linker scripts, Playwright verification probes |
 | `cmake/` | Blender/Cycles WASM CMake cache files and compatibility shim |
 | `demo/` | Upstream browser demo shell |
-| `greenfield-blender-wasm-blueprint/` | Product architecture, planning, CI, deployment, auth/storage, QA, and agent handoff docs |
+| `blueprint/` | Product architecture, planning, CI, deployment, auth/storage, QA, and agent handoff docs |
 | `CLAUDE.md` | Claude Code CLI working instructions |
 | `AGENTS.md` | General implementation-agent instructions |
 | `docs/handoff/` | Dated audit and next-step handoff |
@@ -52,7 +52,7 @@ Do not start by building a fake viewport. Do not present Canvas/WebGL/Three.js p
 For product architecture and implementation planning:
 
 ```text
-greenfield-blender-wasm-blueprint/README.md
+blueprint/README.md
 docs/handoff/2026-08-08-claude-minimax-handoff.md
 CLAUDE.md
 AGENTS.md

@@ -7,7 +7,7 @@ const requiredFiles = [
   'CLAUDE.md',
   'AGENTS.md',
   'Makefile',
-  'greenfield-blender-wasm-blueprint/README.md',
+  'blueprint/README.md',
   'docs/handoff/2026-08-08-claude-minimax-handoff.md',
   'docs/handoff/2026-08-08-audit.md',
   'demo/vite.config.js',

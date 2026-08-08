@@ -65,6 +65,8 @@ Read these documents in order.
 | [`security/19-security-privacy-licensing.md`](security/19-security-privacy-licensing.md) | Threat model, privacy model, secrets, licenses, GPL obligations |
 | [`product/20-design-system-and-accessibility.md`](product/20-design-system-and-accessibility.md) | Visual system, responsive layout, controls, accessibility |
 | [`plans/21-agent-task-backlog.md`](plans/21-agent-task-backlog.md) | Small implementation tickets suitable for MiniMax-style agents |
+| [`plans/22-first-week-execution-plan.md`](plans/22-first-week-execution-plan.md) | Concrete first-week sequence for this fork |
+| [`agents/23-claude-minimax-workflow.md`](agents/23-claude-minimax-workflow.md) | How to divide work between Claude Code and MiniMax |
 | [`ci/06-ci-artifacts-release.md`](ci/06-ci-artifacts-release.md) | CI lanes, release artifacts, artifact manifest |
 | [`agents/07-agent-handoff-rules.md`](agents/07-agent-handoff-rules.md) | Rules for MiniMax or other implementation agents |
 | [`docs/08-risk-register.md`](docs/08-risk-register.md) | Risks and mitigations |
@@ -246,4 +248,3 @@ For any phase to be considered complete:
 5. Docs/build notes are updated.
 6. No fake Blender output is introduced.
 7. The git diff is scoped to the task.
-

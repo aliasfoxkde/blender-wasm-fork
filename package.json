@@ -2,6 +2,9 @@
   "name": "blender-wasm",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "audit:setup": "node scripts/audit-setup.mjs"
+  },
   "devDependencies": {
     "playwright": "^1.61.1"
   }

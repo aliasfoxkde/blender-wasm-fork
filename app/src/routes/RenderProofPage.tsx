@@ -40,17 +40,22 @@ export function RenderProofPage() {
     const runtime = new CyclesRenderRuntime();
     runtimeRef.current = runtime;
 
-    const unsub = runtime.onProgress((p) => {
+    const unsubProgress = runtime.onProgress((p) => {
       setProgress(p ? { phase: p.phase as any, percent: p.percent, message: p.message } : null);
-      setState(runtime.state);
     });
 
-    runtime.load().then(() => {
-      setState(runtime.state);
+    const unsubState = runtime.onStateChange((s) => {
+      setState(s);
     });
+
+    // Set initial state
+    setState(runtime.state);
+
+    runtime.load();
 
     return () => {
-      unsub();
+      unsubProgress();
+      unsubState();
       runtime.dispose();
     };
   }, []);
@@ -67,9 +72,10 @@ export function RenderProofPage() {
   };
 
   const isReady = state === "ready";
-  const isUnavailable = state === "unavailable" || state === "error";
+  const isUnavailable = state === "unavailable";
   const isRendering = state === "rendering";
   const isSuccess = state === "success";
+  const isError = state === "error";
 
   return (
     <main style={{ padding: "2rem", maxWidth: "640px", margin: "0 auto" }}>
@@ -112,7 +118,7 @@ export function RenderProofPage() {
         </div>
       )}
 
-      {state === "error" && (
+      {isError && (
         <div className="status-panel error">
           <p>{progress?.message ?? "An error occurred."}</p>
           <button onClick={() => runtimeRef.current?.load()}>Retry</button>

@@ -11,7 +11,7 @@
  */
 
 import type { ArtifactManifest } from "./ArtifactManifest";
-import { RuntimeStateMachine } from "./runtimeState";
+import { RuntimeStateMachine, type RuntimeState } from "./runtimeState";
 import type { RenderResult } from "./renderResult";
 
 export interface RuntimeProgress {
@@ -51,6 +51,7 @@ export class CyclesRenderRuntime {
   private _wasmReady = false;
   private _state: RuntimeStateMachine;
   private _progressCallbacks: Array<(p: RuntimeProgress) => void> = [];
+  private _stateCallbacks: Array<(s: RuntimeState) => void> = [];
   private _module: CyclesModule | null = null;
 
   constructor() {
@@ -81,9 +82,23 @@ export class CyclesRenderRuntime {
     };
   }
 
+  onStateChange(callback: (s: RuntimeState) => void): () => void {
+    this._stateCallbacks.push(callback);
+    return () => {
+      const idx = this._stateCallbacks.indexOf(callback);
+      if (idx >= 0) this._stateCallbacks.splice(idx, 1);
+    };
+  }
+
   private emit(progress: RuntimeProgress) {
     for (const cb of this._progressCallbacks) {
       cb(progress);
+    }
+  }
+
+  private emitState(state: RuntimeState) {
+    for (const cb of this._stateCallbacks) {
+      cb(state);
     }
   }
 
@@ -106,6 +121,7 @@ export class CyclesRenderRuntime {
     if (this._loaded) return;
 
     this._state.transition("loading");
+    this.emitState(this._state.state);
     this.emit({ phase: "fetch", message: "Checking for render artifacts..." });
 
     // Load manifest
@@ -116,6 +132,7 @@ export class CyclesRenderRuntime {
       manifest = await res.json();
     } catch (err) {
       this._state.transition("error");
+      this.emitState(this._state.state);
       this.emit({
         phase: "fetch",
         message: "Render artifacts are not available. Run 'make mvp' on a builder.",
@@ -129,6 +146,7 @@ export class CyclesRenderRuntime {
     const result = validateArtifactManifest(manifest);
     if (!result.valid) {
       this._state.transition("error");
+      this.emitState(this._state.state);
       this.emit({
         phase: "fetch",
         message: `Artifact manifest is invalid: ${result.errors.join("; ")}`,
@@ -147,6 +165,7 @@ export class CyclesRenderRuntime {
 
   private async _instantiateWasm(): Promise<void> {
     this._state.transition("loading");
+    this.emitState(this._state.state);
     this.emit({ phase: "instantiate", message: "Loading Cycles WASM module..." });
 
     try {
@@ -172,6 +191,7 @@ export class CyclesRenderRuntime {
         this._wasmReady = true;
         this._module = Module as CyclesModule;
         this._state.transition("ready");
+        this.emitState(this._state.state);
         this.emit({ phase: "instantiate", message: "Cycles module ready." });
       };
 
@@ -180,10 +200,12 @@ export class CyclesRenderRuntime {
         this._wasmReady = true;
         this._module = Module as CyclesModule;
         this._state.transition("ready");
+        this.emitState(this._state.state);
         this.emit({ phase: "instantiate", message: "Cycles module ready." });
       }
     } catch (err) {
       this._state.transition("error");
+      this.emitState(this._state.state);
       this.emit({
         phase: "instantiate",
         message: `Failed to load Cycles WASM: ${err}`,
@@ -215,6 +237,7 @@ export class CyclesRenderRuntime {
     }
 
     this._state.transition("rendering");
+    this.emitState(this._state.state);
     this.emit({ phase: "render", percent: 0, message: "Starting render..." });
 
     try {
@@ -225,10 +248,10 @@ export class CyclesRenderRuntime {
       mod.FS.chdir(WASMFS_OUT);
 
       // Build Cycles CLI arguments for a minimal render.
-      // The scene file must be accessible via WASMFS preload (via /scenes/ mount).
-      // width/height are used in the output path; samples controls render quality.
+      // The scene file is preloaded via --preload-file web/scenes@/scenes in link_cycles_web.sh.
       const samples = _options?.samples ?? 32;
       const args = [
+        "/scenes/scene.blend",
         "--background",
         "--cycles-samples", String(samples),
         "-o", `${WASMFS_OUT}/`,
@@ -245,6 +268,7 @@ export class CyclesRenderRuntime {
 
       if (exitCode !== 0) {
         this._state.transition("error");
+        this.emitState(this._state.state);
         this.emit({ phase: "render", message: `Render exited with code ${exitCode}` });
         return { success: false, id: "n/a", error: `Render exited with code ${exitCode}` };
       }
@@ -257,10 +281,12 @@ export class CyclesRenderRuntime {
         }) as unknown as Uint8Array;
       } catch {
         this._state.transition("error");
+        this.emitState(this._state.state);
         return { success: false, id: "n/a", error: "Render completed but no output file found." };
       }
 
       this._state.transition("success");
+      this.emitState(this._state.state);
       this.emit({ phase: "render", percent: 100, message: "Render complete." });
 
       return {
@@ -272,6 +298,7 @@ export class CyclesRenderRuntime {
       };
     } catch (err) {
       this._state.transition("error");
+      this.emitState(this._state.state);
       const message = err instanceof Error ? err.message : String(err);
       this.emit({ phase: "render", message: `Render failed: ${message}` });
       return { success: false, id: "n/a", error: message };
@@ -280,6 +307,7 @@ export class CyclesRenderRuntime {
 
   dispose(): void {
     this._progressCallbacks = [];
+    this._stateCallbacks = [];
     this._manifest = null;
     this._loaded = false;
     this._wasmReady = false;

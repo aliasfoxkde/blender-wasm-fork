@@ -10,6 +10,7 @@ vi.mock("../runtime/CyclesRenderRuntime", () => ({
     isLoaded: false,
     getManifest: () => null,
     onProgress: () => () => {},
+    onStateChange: () => () => {},
     load: vi.fn().mockResolvedValue(undefined),
     renderSampleScene: vi.fn().mockResolvedValue({ success: false, id: "test", error: "no artifacts" }),
     dispose: vi.fn(),

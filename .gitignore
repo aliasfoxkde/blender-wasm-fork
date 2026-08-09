@@ -49,3 +49,8 @@
 *.a
 /scratchpad/
 .DS_Store
+
+# app build outputs
+/app/node_modules/
+/app/dist/
+/app/tsconfig.tsbuildinfo

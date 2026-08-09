@@ -27,6 +27,9 @@ jobs:
       - name: Run setup audit
         run: pnpm audit:setup
 
+      - name: Run artifact audit
+        run: pnpm audit:artifacts
+
       - name: Install demo dependencies
         run: pnpm install --frozen-lockfile
         working-directory: demo
@@ -36,3 +39,18 @@ jobs:
       - name: Build demo
         run: pnpm build
         working-directory: demo
+
+      - name: Install app dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: app
+        env:
+          CI: true
+
+      - name: Typecheck app
+        run: pnpm --filter blender-wasm-app typecheck
+
+      - name: Test app
+        run: pnpm --filter blender-wasm-app test
+
+      - name: Build app
+        run: pnpm --filter blender-wasm-app build

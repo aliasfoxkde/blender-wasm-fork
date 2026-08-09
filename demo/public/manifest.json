@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "name": "cycles-render",
+  "version": "0.0.1-mvp",
+  "createdAt": "2026-08-09T00:22:00Z",
+  "source": {
+    "remote": "https://github.com/HeyPuter/blender",
+    "ref": "6b031d3d41c392883e3c495aa72343e10d15b43d"
+  },
+  "toolchain": {
+    "emscripten": "6.0.1",
+    "node": "24.19.0"
+  },
+  "artifacts": [
+    {
+      "file": "cycles.js",
+      "size": 204106,
+      "hash": "sha256:manual"
+    },
+    {
+      "file": "cycles.wasm",
+      "size": 17101800,
+      "hash": "sha256:manual"
+    },
+    {
+      "file": "cycles.data",
+      "size": 12,
+      "hash": "sha256:manual"
+    }
+  ],
+  "capabilities": ["headless-render", "filesystem", "pthreads"],
+  "requirements": {
+    "crossOriginIsolated": true,
+    "sharedArrayBuffer": true
+  }
+}

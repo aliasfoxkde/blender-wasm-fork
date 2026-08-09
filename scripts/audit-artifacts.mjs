@@ -24,11 +24,10 @@ import { resolve, join } from 'node:path';
 
 const PUBLIC_DIR = resolve('demo/public');
 const TARGETS = [
-  'blender.js',
-  'blender.wasm.zst',
-  'assets.tar.zst',
+  'cycles.js',
+  'cycles.wasm',
+  'cycles.data',
   'manifest.json',
-  'wgsl-cache.json',
 ];
 
 function fileSize(path) {

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cycles Render</title>
+  <style>
+    body { margin: 0; background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    canvas { display: block; max-width: 100%; }
+    #status { position: fixed; top: 8px; left: 8px; color: #ccc; font: 12px monospace; }
+    #log { position: fixed; bottom: 8px; left: 8px; color: #888; font: 10px monospace; max-width: 80%; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="status">Loading...</div>
+  <div id="log"></div>
+
+  <script>
+    var Module = {};
+    var statusEl = document.getElementById('status');
+    var logEl = document.getElementById('log');
+    var canvas = document.getElementById('canvas');
+
+    function log(msg) {
+      console.log('[render]', msg);
+      logEl.textContent += msg + '\n';
+    }
+
+    Module['locateFile'] = function(path) {
+      if (path.endsWith('.wasm')) return '/cycles.wasm';
+      if (path.endsWith('.data')) return '/cycles.data';
+      return '/' + path;
+    };
+
+    Module['onRuntimeInitialized'] = function() {
+      log('Cycles module ready');
+      statusEl.textContent = 'Rendering...';
+      runRender();
+    };
+
+    Module['print'] = function(msg) { log('[stdout] ' + msg); };
+    Module['printErr'] = function(msg) { log('[stderr] ' + msg); };
+
+    async function runRender() {
+      try {
+        var w = 128, h = 128;
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d');
+
+        // WASMFS output dir
+        Module['FS'].mkdir('/out');
+        Module['FS'].chdir('/out');
+
+        // Render a built-in scene (if available) or a default scene.
+        // Cycles standalone needs a .blend file for scene data.
+        // Without one, we report honest failure rather than fake pixels.
+        var args = [
+          '--background',
+          '--cycles-samples', '8',
+          '-o', '/out/',
+          '-F', 'PNG',
+          '-x', '1',
+          '-f', '1',
+        ];
+
+        log('Running: cycles ' + args.join(' '));
+        statusEl.textContent = 'Running Cycles...';
+
+        var exitCode = Module['callMain'](args);
+        log('callMain returned: ' + exitCode);
+
+        if (exitCode !== 0) {
+          window.__RENDER_FAIL__ = { exitCode: exitCode };
+          window.__STATUS__ = 'render-error';
+          statusEl.textContent = 'Render failed (exit ' + exitCode + ')';
+          return;
+        }
+
+        // Read output PNG
+        var pngBytes;
+        try {
+          pngBytes = Module['FS'].readFile('/out/0001.png', { encoding: 'binary' });
+        } catch(e) {
+          window.__RENDER_FAIL__ = { error: e.message };
+          window.__STATUS__ = 'no-output';
+          statusEl.textContent = 'No output file found';
+          return;
+        }
+
+        // Display on canvas via Blob URL
+        var blob = new Blob([pngBytes], { type: 'image/png' });
+        var url = URL.createObjectURL(blob);
+        var img = new Image();
+        img.onload = function() {
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(url);
+          window.__RENDER_DONE__ = { width: w, height: h, ts: Date.now() };
+          window.__STATUS__ = 'render-ok';
+          statusEl.textContent = 'Render OK — ' + w + 'x' + h;
+          log('Done. PNG size: ' + pngBytes.length + ' bytes');
+        };
+        img.onerror = function() {
+          window.__RENDER_FAIL__ = { error: 'Image decode failed' };
+          window.__STATUS__ = 'decode-error';
+          statusEl.textContent = 'Image decode failed';
+        };
+        img.src = url;
+
+      } catch(e) {
+        window.__RENDER_FAIL__ = { error: e.message };
+        window.__STATUS__ = 'uncaught';
+        statusEl.textContent = 'Error: ' + e.message;
+        log('Uncaught: ' + e.message);
+      }
+    }
+  </script>
+  <script src="/cycles.js"></script>
+</body>
+</html>

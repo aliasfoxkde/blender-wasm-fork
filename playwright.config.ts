@@ -21,7 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm --filter blender-wasm-app exec vite preview --port 4173",
+    command: "node scripts/serve-with-headers.mjs 4173 web",
     url: "http://localhost:4173",
     reuseExistingServer: !process.env.CI,
     timeout: 30000,

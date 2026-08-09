@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smoke WASM — pthreads + SIMD</title>
+  <style>
+    body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    var Module = {};
+    Module.onRuntimeInitialized = function() {
+      var w = Module._img_w();
+      var h = Module._img_h();
+      var canvas = document.getElementById('c');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      var pixels = _render();
+      var imgData = ctx.createImageData(w, h);
+      imgData.data.set(HEAPU8.subarray(pixels, pixels + w * h * 4));
+      ctx.putImageData(imgData, 0, 0);
+    };
+  </script>
+  <script src="smoke.js"></script>
+</body>
+</html>

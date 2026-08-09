@@ -21,6 +21,7 @@ test.describe("Smoke WASM", () => {
   test("canvas renders non-blank output", async ({ page }) => {
     await page.goto("http://localhost:4173/smoke.html");
     // Wait for the canvas to show content (non-black pixels)
+    await page.waitForTimeout(4000);
     const hasContent = await page.evaluate(() => {
       const canvas = document.querySelector("canvas") as HTMLCanvasElement;
       if (!canvas) return false;

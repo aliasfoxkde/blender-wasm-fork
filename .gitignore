@@ -38,10 +38,8 @@
 /demo/node_modules/
 /demo/dist/
 /demo/.stage/
-/demo/public/blender.js
 /demo/public/blender.wasm.zst
 /demo/public/assets.tar.zst
-/demo/public/manifest.json
 /demo/public/wgsl-cache.json
 
 # misc
@@ -49,6 +47,12 @@
 *.a
 /scratchpad/
 .DS_Store
+
+# built WASM artifacts (reproducible via make)
+/web/blender.wasm
+/web/blender.data
+/web/cycles.wasm.zst
+/web/verify-shot.png
 
 # app build outputs
 /app/node_modules/

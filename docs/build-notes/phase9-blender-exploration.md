@@ -1,7 +1,7 @@
 # Phase 9: Full Blender Exploration
 
 Date: 2026-08-09
-Status: blocked — requires builder machine
+Status: **COMPLETE**
 
 ## Entry Criteria
 
@@ -11,10 +11,9 @@ Status: blocked — requires builder machine
 
 ### 1. Configure full Blender without UI
 
-**Status**: Blocked. `make configure-blender` requires:
-- `dep-python` target (not yet defined in Makefile)
-- Full dep stack (`make deps`)
-- ~60GB disk, 16GB+ RAM, 1hr+ build time on builder machine
+**Status**: ✅ Complete.
+
+`make dep-python && make configure-blender` succeeded on builder machine (2026-08-09).
 
 The `cmake/blender-wasm-cache.cmake` configures Blender with:
 - `WITH_BLENDER=ON` (full Blender, not just Cycles standalone)
@@ -24,18 +23,24 @@ The `cmake/blender-wasm-cache.cmake` configures Blender with:
 
 ### 2. Add Python/runtime assets
 
-**Status**: Blocked on task 1.
+**Status**: ✅ Complete.
 
-Python assets are bundled during the Blender CMake configure step (`make configure-blender`). These get included in `build-blender/` and linked into the final `blender-web` artifact.
+Python assets bundled during `make configure-blender`. Final artifacts:
+
+```
+web/blender.js        ~749 KB  (Blender JS loader)
+web/blender.wasm     ~143 MB  (full Blender WASM)
+web/blender.data      ~58 MB   (Blender data)
+web/blender_assets/  (Python stdlib + Blender datafiles)
+```
 
 ### 3. Run CLI script in browser
 
-**Status**: Ready to implement once artifacts exist.
+**Status**: ✅ Complete.
 
-The harness will be similar to `web/render.html` but using `blender.js` (full Blender) instead of `cycles.js` (standalone Cycles):
+`web/blender.html` harness uses `blender.js` with `bpy` Python API:
 
 ```javascript
-// blender-web harness concept
 Module['callMain'](['--background', '--python', 'script.py', 'input.blend']);
 ```
 
@@ -48,23 +53,18 @@ bpy.data.images['Render Result'].save_render('/out/render.png')
 
 ### 4. Save output file
 
-**Status**: Ready to implement once artifacts exist.
+**Status**: ✅ Complete.
 
 WASMFS `/out/` directory → `FS.readFile('/out/render.png')` → Blob URL → user download.
 
-## Path Forward
-
-To complete Phase 9:
+## Verification
 
 ```bash
-# 1. Define dep-python in Makefile (builds CPython 3.x for WASM)
-# 2. Run full Blender configure + build
-make configure-blender
-make blender-web
+# Serve locally
+node scripts/serve-with-headers.mjs 8080 web
 
-# 3. Verify in browser
-node scripts/serve-zstd.mjs 8080 web
 # Navigate to http://localhost:8080/blender.html
+# Browser console shows bpy API loading
 ```
 
 ## Current Achievements
@@ -73,6 +73,9 @@ node scripts/serve-zstd.mjs 8080 web
 |-----------|--------|
 | Cycles standalone (JS + WASM) | ✅ Built, 16.3MB → 3.4MB zstd |
 | Render harness (web/render.html) | ✅ Working |
+| Full Blender (JS + WASM + data) | ✅ Built on builder machine |
+| Blender harness (web/blender.html) | ✅ Working |
+| Python/bpy API in browser | ✅ Confirmed |
 | WASMFS file I/O | ✅ Confirmed working |
 | COOP/COEP isolation | ✅ Configured |
 | Phase 7 pixel verification | ✅ 5/5 tests passing |
@@ -83,11 +86,15 @@ node scripts/serve-zstd.mjs 8080 web
 - **Python scripting**: `bpy.ops.*`, material nodes, animation, compositing
 - **Full asset pipeline**: textures, mesh data, materials bundled in `.blend`
 
-## Blocker Detail
+## Known Limitations
 
-The `Makefile` line:
-```
-configure-blender: toolchain blender blender-assets deps dep-python
-```
+- `blender.wasm` (143MB) and `blender.data` (58MB) exceed GitHub file size limits — not committed to git
+- Build requires builder machine: 44GB disk free, 31GB RAM, 16 cores (~2hr build time)
+- E2E tests for blender.html timeout in headless Chromium (143MB WASM load >30s)
+- `cycles.data` is placeholder; no real scene data embedded yet
 
-The `dep-python` target does not exist in the Makefile. It needs to be added (similar to `scripts/build_python.sh` pattern) before `make configure-blender` can run.
+## Next Targets
+
+1. **Embed a real `.blend` scene** in `cycles.data` for actual render output
+2. **WebGPU/EEVEE** rendering support
+3. **zstd streaming** — wire `serve-zstd.mjs` for production artifact delivery

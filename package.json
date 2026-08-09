@@ -6,7 +6,13 @@
     "audit:setup": "node scripts/audit-setup.mjs",
     "audit:artifacts": "node scripts/audit-artifacts.mjs"
   },
+  "scripts": {
+    "audit:setup": "node scripts/audit-setup.mjs",
+    "audit:artifacts": "node scripts/audit-artifacts.mjs",
+    "test:e2e": "playwright test"
+  },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "playwright": "^1.61.1"
   }
 }

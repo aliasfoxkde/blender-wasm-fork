@@ -47,7 +47,7 @@ NPROC         := $(shell nproc)
 WASM_CFLAGS   := -O2 -pthread -msimd128 -msse4.2 -fexceptions
 WASM_CXXFLAGS := $(WASM_CFLAGS)
 
-.PHONY: all mvp toolchain blender blender-assets deps configure-cycles cycles cycles-web configure-blender blender-web verify-blender-webgpu web smoke serve verify verify-render verify-webgpu clean-build print-env
+.PHONY: all mvp toolchain blender blender-assets deps dep-python configure-cycles cycles cycles-web configure-blender blender-web verify-blender-webgpu web smoke serve verify verify-render verify-webgpu clean-build print-env
 
 all: toolchain blender
 

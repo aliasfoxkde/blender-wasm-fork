@@ -55,15 +55,17 @@ WB="$BLD/python-wasm"; rm -rf "$WB"; mkdir -p "$WB"
 # Fold them in. Prefix member names: libmpdec has context.o/io.o whose BASENAMES
 # collide with core CPython objects in the flat-namespaced archive (`ar r` keys
 # by basename and would silently overwrite Python's own context.o).
+# NOTE: expat objects (xmlparse.o etc.) are NOT added — the dep's libexpat.a
+# is linked separately and must remain the sole provider of expat symbols
+# to avoid duplicate symbol errors at the final Blender link step.
 _mz=$(mktemp -d)
 for _o in "$WB"/Modules/_decimal/libmpdec/*.o \
-          "$WB"/Modules/expat/xmlparse.o "$WB"/Modules/expat/xmltok.o "$WB"/Modules/expat/xmlrole.o \
           "$WB"/Modules/_hacl/Hacl_Hash_SHA2.o; do
   [ -f "$_o" ] && cp "$_o" "$_mz/pymod_$(basename "$_o")"
 done
 if ls "$_mz"/*.o >/dev/null 2>&1; then
   emar r "$SYSROOT/lib/libpython3.13.a" "$_mz"/*.o
-  log "archived bundled libmpdec/expat/hacl objects into libpython3.13.a"
+  log "archived bundled libmpdec/hacl objects into libpython3.13.a"
 fi
 rm -rf "$_mz"
 

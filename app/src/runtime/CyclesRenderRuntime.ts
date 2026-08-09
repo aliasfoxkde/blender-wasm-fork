@@ -3,15 +3,11 @@
  *
  * Browser runtime adapter for the Cycles headless WASM renderer.
  *
- * This is the product-side adapter that sits between the UI and the
- * actual Blender WASM runtime. It is responsible for:
+ * Responsibilities:
  * - Loading and validating the artifact manifest
  * - Reporting clear missing-artifact states (never fake success)
- * - Instantiating the WASM module
+ * - Instantiating the WASM module from /demo/public/
  * - Dispatching render commands and returning real result bytes
- *
- * The actual WASM instantiation and render execution are deferred until
- * real artifacts are available and the runtime is properly integrated.
  */
 
 import type { ArtifactManifest } from "./ArtifactManifest";
@@ -32,14 +28,30 @@ export interface RenderOptions {
   timeoutMs?: number;
 }
 
+interface CyclesModule {
+  callMain: (args: string[]) => number;
+  ccall: (ident: string, returnType: string, argTypes: string[], args?: unknown[]) => unknown;
+  cwrap: (ident: string, returnType: string, argTypes?: string[]) => unknown;
+  FS: {
+    readFile: (path: string, opts?: { encoding?: string; flag?: string }) => string | Uint8Array;
+    writeFile: (path: string, data: string | Uint8Array) => void;
+    mkdir: (path: string) => void;
+    chdir: (path: string) => void;
+  };
+  onRuntimeInitialized: () => void;
+  locateFile: (path: string) => string;
+}
 
 const ARTIFACT_BASE = "/demo/public";
+const WASMFS_OUT = "/out";
 
 export class CyclesRenderRuntime {
   private _manifest: ArtifactManifest | null = null;
   private _loaded = false;
+  private _wasmReady = false;
   private _state: RuntimeStateMachine;
   private _progressCallbacks: Array<(p: RuntimeProgress) => void> = [];
+  private _module: CyclesModule | null = null;
 
   constructor() {
     this._state = new RuntimeStateMachine("unavailable");
@@ -51,6 +63,10 @@ export class CyclesRenderRuntime {
 
   get isLoaded() {
     return this._loaded;
+  }
+
+  get isWasmReady() {
+    return this._wasmReady;
   }
 
   getManifest(): ArtifactManifest | null {
@@ -71,12 +87,20 @@ export class CyclesRenderRuntime {
     }
   }
 
+  private async loadScript(src: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) { resolve(); return; }
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+      document.head.appendChild(script);
+    });
+  }
+
   /**
-   * Load the artifact manifest and probe for artifact availability.
-   * Does NOT instantiate the WASM module (that requires a real builder run).
-   *
-   * If no manifest exists, the runtime enters the "unavailable" state
-   * and reports a clear diagnostic message — NOT a fake success.
+   * Load the artifact manifest and instantiate the Cycles WASM module.
    */
   async load(): Promise<void> {
     if (this._loaded) return;
@@ -84,12 +108,11 @@ export class CyclesRenderRuntime {
     this._state.transition("loading");
     this.emit({ phase: "fetch", message: "Checking for render artifacts..." });
 
+    // Load manifest
     let manifest: unknown = null;
     try {
       const res = await fetch(`${ARTIFACT_BASE}/manifest.json`);
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       manifest = await res.json();
     } catch (err) {
       this._state.transition("error");
@@ -101,7 +124,7 @@ export class CyclesRenderRuntime {
       return;
     }
 
-    // Validate the manifest shape
+    // Validate manifest
     const { validateArtifactManifest } = await import("./validateArtifactManifest");
     const result = validateArtifactManifest(manifest);
     if (!result.valid) {
@@ -116,16 +139,63 @@ export class CyclesRenderRuntime {
 
     this._manifest = manifest as ArtifactManifest;
     this._loaded = true;
-    this._state.transition("ready");
-    this.emit({ phase: "instantiate", message: "Artifacts loaded. Ready to render." });
+    this.emit({ phase: "fetch", message: "Manifest loaded." });
+
+    // Instantiate WASM module
+    await this._instantiateWasm();
+  }
+
+  private async _instantiateWasm(): Promise<void> {
+    this._state.transition("loading");
+    this.emit({ phase: "instantiate", message: "Loading Cycles WASM module..." });
+
+    try {
+      // Expose locateFile so emscripten can find cycles.wasm next to cycles.js
+      (window as unknown as Record<string, unknown>).__cyclesLocateFile = (path: string) => {
+        if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm`;
+        if (path.endsWith(".data")) return `${ARTIFACT_BASE}/cycles.data`;
+        return `${ARTIFACT_BASE}/${path}`;
+      };
+
+      await this.loadScript(`${ARTIFACT_BASE}/cycles.js`);
+
+      const rawModule = (window as unknown as Record<string, unknown>)["Module"];
+      const Module = typeof rawModule === "function" ? rawModule() : rawModule as Partial<CyclesModule>;
+
+      Module["locateFile"] = (path: string) => {
+        if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm`;
+        if (path.endsWith(".data")) return `${ARTIFACT_BASE}/cycles.data`;
+        return `${ARTIFACT_BASE}/${path}`;
+      };
+
+      Module["onRuntimeInitialized"] = () => {
+        this._wasmReady = true;
+        this._module = Module as CyclesModule;
+        this._state.transition("ready");
+        this.emit({ phase: "instantiate", message: "Cycles module ready." });
+      };
+
+      // If already initialized (cached), fire immediately
+      if ((Module as CyclesModule).callMain) {
+        this._wasmReady = true;
+        this._module = Module as CyclesModule;
+        this._state.transition("ready");
+        this.emit({ phase: "instantiate", message: "Cycles module ready." });
+      }
+    } catch (err) {
+      this._state.transition("error");
+      this.emit({
+        phase: "instantiate",
+        message: `Failed to load Cycles WASM: ${err}`,
+      });
+      console.error("[CyclesRenderRuntime] WASM load failed:", err);
+    }
   }
 
   /**
-   * Render a sample scene.
+   * Render a scene using the Cycles WASM module.
    *
-   * Currently returns a clear "not available" result since real WASM
-   * artifacts have not been produced yet. When real artifacts are present
-   * and the WASM module is instantiated, this will return actual pixels.
+   * Uses WASMFS (/out/ as output directory) to capture the render PNG.
    */
   async renderSampleScene(_options?: RenderOptions): Promise<RenderResult> {
     if (!this._loaded || !this._manifest) {
@@ -136,31 +206,84 @@ export class CyclesRenderRuntime {
       };
     }
 
+    if (!this._wasmReady || !this._module) {
+      return {
+        success: false,
+        id: "n/a",
+        error: "WASM module not ready. Loading may have failed.",
+      };
+    }
+
     this._state.transition("rendering");
     this.emit({ phase: "render", percent: 0, message: "Starting render..." });
 
-    // Real WASM execution goes here once artifacts are built.
-    // For now, return a clear unavailable result.
-    this._state.transition("error");
-    this.emit({
-      phase: "render",
-      message: "Render requires built WASM artifacts. Run 'make mvp' on a builder.",
-    });
+    try {
+      const mod = this._module;
 
-    return {
-      success: false,
-      id: "n/a",
-      error:
-        "Real render not yet available. " +
-        "The Cycles WASM artifact has not been built. " +
-        "Run 'make mvp' on a machine with enough RAM/disk to produce artifacts.",
-    };
+      // Ensure output directory exists in WASMFS
+      mod.FS.mkdir(WASMFS_OUT);
+      mod.FS.chdir(WASMFS_OUT);
+
+      // Build Cycles CLI arguments for a minimal render.
+      // The scene file must be accessible via WASMFS preload (via /scenes/ mount).
+      // width/height are used in the output path; samples controls render quality.
+      const samples = _options?.samples ?? 32;
+      const args = [
+        "--background",
+        "--cycles-samples", String(samples),
+        "-o", `${WASMFS_OUT}/`,
+        "-F", "PNG",
+        "-x", "1",
+        "-f", "1",
+      ];
+
+      this.emit({ phase: "render", percent: 20, message: "Running Cycles render..." });
+
+      const exitCode = mod.callMain(args);
+
+      this.emit({ phase: "render", percent: 90, message: "Reading output..." });
+
+      if (exitCode !== 0) {
+        this._state.transition("error");
+        this.emit({ phase: "render", message: `Render exited with code ${exitCode}` });
+        return { success: false, id: "n/a", error: `Render exited with code ${exitCode}` };
+      }
+
+      // Read the output PNG from WASMFS
+      let pngBytes: Uint8Array;
+      try {
+        pngBytes = mod.FS.readFile(`${WASMFS_OUT}/0001.png`, {
+          encoding: "binary",
+        }) as unknown as Uint8Array;
+      } catch {
+        this._state.transition("error");
+        return { success: false, id: "n/a", error: "Render completed but no output file found." };
+      }
+
+      this._state.transition("success");
+      this.emit({ phase: "render", percent: 100, message: "Render complete." });
+
+      return {
+        success: true,
+        id: `cycles-${Date.now()}`,
+        imageBytes: pngBytes,
+        width: _options?.width ?? 128,
+        height: _options?.height ?? 128,
+      };
+    } catch (err) {
+      this._state.transition("error");
+      const message = err instanceof Error ? err.message : String(err);
+      this.emit({ phase: "render", message: `Render failed: ${message}` });
+      return { success: false, id: "n/a", error: message };
+    }
   }
 
   dispose(): void {
     this._progressCallbacks = [];
     this._manifest = null;
     this._loaded = false;
+    this._wasmReady = false;
+    this._module = null;
     this._state = new RuntimeStateMachine("unavailable");
   }
 }

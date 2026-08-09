@@ -127,7 +127,38 @@ async function fetchZst(url, key) {
 }
 
 const decoder = new ZSTDDecoder();
-const manifest = await (await fetch("manifest.json")).json();
+/* Check for artifact manifest before attempting to download anything.
+ * If manifest.json is absent, show an honest unavailable state instead of
+ * throwing a cryptic network error. */
+let manifest;
+try {
+  const res = await fetch("manifest.json");
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  manifest = await res.json();
+} catch (err) {
+  if (err instanceof TypeError && err.message.includes("fetch")) {
+    // Network error — artifacts not available
+  } else {
+    console.error("manifest.json: " + (err.message || err));
+  }
+  manifest = null;
+}
+
+if (!manifest) {
+  console.log("SKIP: render artifacts not available");
+  console.log("      Run 'make mvp' on a builder to produce artifacts.");
+  setUiPhase("unavailable");
+  document.getElementById("splash-status").textContent =
+    "Render artifacts are not available in this build.";
+  // Disable launch gate permanently — nothing to do
+  const btn = document.getElementById("start-btn");
+  btn.disabled = true;
+  btn.textContent = "Not Available";
+  // Still probe GPU (it runs async and doesn't hurt), but keep button disabled
+  probeGpu().then(applyGpuStatus).catch(() => {});
+  // Stop here — do NOT attempt downloads or init
+  throw new Error("ARTIFACTS_UNAVAILABLE");
+}
 
 /* ---- In-memory tar FsProvider (pattern + code from gecko-wasm chrome-fs.ts).
  * The tar is indexed as path -> Uint8Array VIEWS into the one decompressed

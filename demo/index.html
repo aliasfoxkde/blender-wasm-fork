@@ -115,6 +115,15 @@
               <p id="webgpu-note" class="jspi-note" hidden></p>
             </div>
 
+            <!-- Unavailable state: shown when render artifacts (manifest.json) are absent.
+                 Uses the same #splash-status element that the loading/ready states use. -->
+            <div class="panel-unavailable" aria-label="Unavailable">
+              <p class="splash-status-unavailable">
+                Render artifacts are not available in this build.<br />
+                <span>Run <code>make mvp</code> on a builder to produce artifacts.</span>
+              </p>
+            </div>
+
             <!-- GPU status: populated early (before downloads finish) by the
                  adapter probe. Shown only when WebGPU is missing or falls back
                  to a software renderer; the acknowledgement checkbox gates the

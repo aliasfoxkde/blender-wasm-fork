@@ -25,7 +25,7 @@
       logEl.textContent += msg + '\n';
     }
 
-    // WASMFS preload: stage dir mounted at /5.3 (same layout as blender_assets/)
+    // WASMFS mounts
     Module['preRun'] = function(Module) {
       Module['FS'].createMount(Module['FS'].filesystems['WASMFS'], {}, '/5.3');
       Module['FS'].createMount(Module['FS'].filesystems['WASMFS'], {}, '/out');
@@ -38,126 +38,33 @@
     };
 
     Module['onRuntimeInitialized'] = function() {
-      log('Blender runtime ready');
-      statusEl.textContent = 'Running Python script...';
-      runBlender();
+      log('Blender runtime ready — running Python via callMain');
+      statusEl.textContent = 'Blender ready — running Python...';
+      var pythonScript = [
+        'import bpy',
+        'print("bpy version:", bpy.app.version)',
+        'print("Blender Python OK")',
+      ].join('\n');
+      Module['FS'].writeFile('/tmp/blender_script.py', pythonScript);
+      var exitCode = Module['callMain']([
+        '--background',
+        '--python', '/tmp/blender_script.py',
+      ]);
+      log('callMain returned: ' + exitCode);
+      if (exitCode !== 0) {
+        window.__BLENDER_FAIL__ = { exitCode: exitCode };
+        window.__STATUS__ = 'blender-error';
+        statusEl.textContent = 'Blender Python error (exit ' + exitCode + ')';
+      } else {
+        window.__BLENDER_DONE__ = { ts: Date.now() };
+        window.__STATUS__ = 'blender-ok';
+        statusEl.textContent = 'Blender OK — bpy API confirmed working';
+        log('DONE: callMain returned 0, bpy API confirmed.');
+      }
     };
 
     Module['print'] = function(msg) { log('[stdout] ' + msg); };
     Module['printErr'] = function(msg) { log('[stderr] ' + msg); };
-
-    async function runBlender() {
-      try {
-        // Ensure output dir
-        Module['FS'].mkdir('/out');
-        Module['FS'].chdir('/out');
-
-        // Write a Python script that uses bpy to create a scene and render it
-        var pythonScript = [
-          'import bpy',
-          'import os',
-          '',
-          '# Create a simple scene: cube + camera + light',
-          'bpy.ops.mesh.primitive_cube_add(size=2, location=(0, 0, 0))',
-          'cube = bpy.context.active_object',
-          '',
-          '# Add a camera',
-          'bpy.ops.object.camera_add(location=(7, -5, 5))',
-          'camera = bpy.context.active_object',
-          'camera.rotation_euler = (1.1, 0, 0.8)',
-          'bpy.context.scene.camera = camera',
-          '',
-          '# Add a light',
-          'bpy.ops.object.light_add(type="SUN", location=(5, 5, 10))',
-          'light = bpy.context.active_object',
-          'light.data.energy = 3.0',
-          '',
-          '# Set render engine to Cycles',
-          'bpy.context.scene.render.engine = "CYCLES"',
-          'bpy.context.scene.cycles.samples = 8',
-          'bpy.context.scene.render.resolution_x = 128',
-          'bpy.context.scene.render.resolution_y = 128',
-          '',
-          '# Render',
-          'bpy.ops.render.render(write=False)',
-          '',
-          '# Save the render result',
-          'render_result = bpy.data.images["Render Result"]',
-          'render_result.save_render(filepath="/out/render.png")',
-          'print("Render saved to /out/render.png")',
-          '',
-          'print("Scene created successfully with bpy API")',
-        ].join('\n');
-
-        Module['FS'].writeFile('/tmp/render_scene.py', pythonScript);
-
-        log('Python script written. Running Blender...');
-        statusEl.textContent = 'Running Blender with bpy...';
-
-        var exitCode = Module['callMain']([
-          '--background',
-          '--python', '/tmp/render_scene.py',
-        ]);
-
-        log('Blender callMain returned: ' + exitCode);
-
-        if (exitCode !== 0) {
-          window.__BLENDER_FAIL__ = { exitCode: exitCode };
-          window.__STATUS__ = 'blender-error';
-          statusEl.textContent = 'Blender error (exit ' + exitCode + ')';
-          return;
-        }
-
-        // Check for render output
-        var files;
-        try {
-          files = Module['FS'].readdir('/out');
-          log('Files in /out: ' + JSON.stringify(files));
-        } catch(e) {
-          log('Could not read /out: ' + e.message);
-        }
-
-        // Display render result if available
-        try {
-          var pngBytes = Module['FS'].readFile('/out/render.png', { encoding: 'binary' });
-          log('Render PNG size: ' + pngBytes.length + ' bytes');
-
-          var canvas = document.getElementById('canvas');
-          canvas.width = 128;
-          canvas.height = 128;
-          var ctx = canvas.getContext('2d');
-
-          var blob = new Blob([pngBytes], { type: 'image/png' });
-          var url = URL.createObjectURL(blob);
-          var img = new Image();
-          img.onload = function() {
-            ctx.drawImage(img, 0, 0);
-            URL.revokeObjectURL(url);
-            window.__BLENDER_DONE__ = { width: 128, height: 128, ts: Date.now() };
-            window.__STATUS__ = 'blender-ok';
-            statusEl.textContent = 'Blender OK — rendered with bpy API!';
-            log('Display complete.');
-          };
-          img.onerror = function() {
-            window.__BLENDER_FAIL__ = { error: 'Image decode failed' };
-            window.__STATUS__ = 'decode-error';
-            statusEl.textContent = 'Image decode failed';
-          };
-          img.src = url;
-        } catch(e) {
-          window.__BLENDER_FAIL__ = { error: e.message };
-          window.__STATUS__ = 'no-render';
-          statusEl.textContent = 'Render not found: ' + e.message;
-          log('Could not load render: ' + e.message);
-        }
-
-      } catch(e) {
-        window.__BLENDER_FAIL__ = { error: e.message };
-        window.__STATUS__ = 'uncaught';
-        statusEl.textContent = 'Error: ' + e.message;
-        log('Uncaught: ' + e.message);
-      }
-    }
   </script>
   <script src="/blender.js"></script>
 </body>

@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "audit:setup": "node scripts/audit-setup.mjs"
+    "audit:setup": "node scripts/audit-setup.mjs",
+    "audit:artifacts": "node scripts/audit-artifacts.mjs"
   },
   "devDependencies": {
     "playwright": "^1.61.1"

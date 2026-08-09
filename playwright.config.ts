@@ -11,6 +11,9 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "list",
+  /* Exclude @deployed tests by default — they require a live deployment and
+   * must be run explicitly with --grep "@deployed" or by setting BASE_URL. */
+  grepInvert: /@deployed/,
   use: {
     trace: "on-first-retry",
   },

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { execSync } from 'node:child_process';
 
 const requiredFiles = [
   'README.md',
@@ -51,26 +52,32 @@ if (!pkg.scripts?.['audit:setup']) {
   console.log('OK package.json scripts.audit:setup');
 }
 
+// Use `git remote -v` so it works in CI (actions/checkout may not preserve full .git/config)
 try {
-  const gitConfig = readFileSync('.git/config', 'utf8');
-  if (!gitConfig.includes('[remote "upstream"]')) {
-    console.error('FAIL missing upstream remote for HeyPuter fetches');
-    failed = true;
-  } else if (!gitConfig.includes('pushurl = DISABLED_UPSTREAM_PUSH')) {
+  const remotes = execSync('git remote -v', { encoding: 'utf8' });
+
+  // upstream is required for local development (needed for `git fetch upstream`)
+  // but may not exist in CI (actions/checkout only clones origin)
+  const hasUpstream = remotes.includes('upstream');
+  const upstreamPushDisabled = hasUpstream && remotes.includes('DISABLED_UPSTREAM_PUSH');
+  if (!hasUpstream) {
+    console.warn('WARN no upstream remote found — needed for `git fetch upstream`. Run: git remote add upstream https://github.com/HeyPuter/blender-wasm.git && git remote set-url --push upstream DISABLED_UPSTREAM_PUSH');
+  } else if (!upstreamPushDisabled) {
     console.error('FAIL upstream push URL is not disabled. Run: git remote set-url --push upstream DISABLED_UPSTREAM_PUSH');
     failed = true;
   } else {
-    console.log('OK upstream push URL disabled');
+    console.log('OK upstream remote configured with push disabled');
   }
 
-  if (!gitConfig.includes('[remote "origin"]') || !gitConfig.includes('github.com/aliasfoxkde/blender-wasm-fork')) {
+  const originOk = remotes.includes('origin') && remotes.includes('aliasfoxkde/blender-wasm-fork');
+  if (!originOk) {
     console.error('FAIL origin remote must point to the user fork: https://github.com/aliasfoxkde/blender-wasm-fork.git');
     failed = true;
   } else {
     console.log('OK origin points to user fork');
   }
 } catch {
-  console.warn('WARN unable to inspect .git/config for remote policy');
+  console.warn('WARN unable to run git remote -v for remote policy check');
 }
 
 if (failed) {

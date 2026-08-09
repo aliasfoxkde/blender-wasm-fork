@@ -52,10 +52,10 @@
         Module['FS'].mkdir('/out');
         Module['FS'].chdir('/out');
 
-        // Render a built-in scene (if available) or a default scene.
         // Cycles standalone needs a .blend file for scene data.
-        // Without one, we report honest failure rather than fake pixels.
+        // The scene is preloaded via --preload-file web/scenes@/scenes in link_cycles_web.sh.
         var args = [
+          '/scenes/scene.blend',
           '--background',
           '--cycles-samples', '8',
           '-o', '/out/',

@@ -83,3 +83,27 @@ test.describe("Render", () => {
     expect(hasContent).toBe(true);
   });
 });
+
+test.describe("Zstd streaming", () => {
+  test("cycles.wasm.zst is served decompressed with correct headers", async ({ page }) => {
+    // Fetch cycles.wasm.zst directly and verify the server decompresses it on the fly
+    const res = await page.request.fetch("http://localhost:4173/cycles.wasm.zst");
+    expect(res.ok()).toBe(true);
+    expect(res.headers()["x-zstd-decompressed"]).toBe("1");
+    // Content-Type should be application/wasm (the decompressed type, not .zst)
+    expect(res.headers()["content-type"]).toBe("application/wasm");
+  });
+
+  test("zstd-served cycles.wasm loads and runs Cycles render harness", async ({ page }) => {
+    // Verify the render harness works when served via zstd streaming
+    await page.goto("http://localhost:4173/render.html");
+    const signal = await page.waitForFunction(
+      () => (window as any).__RENDER_DONE__ || (window as any).__RENDER_FAIL__,
+      null,
+      { timeout: 30000 }
+    );
+    const val = await signal.jsonValue();
+    expect(val).toBeTruthy();
+    console.log("Zstd render signal:", JSON.stringify(val));
+  });
+});

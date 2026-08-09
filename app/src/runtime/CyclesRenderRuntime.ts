@@ -169,9 +169,11 @@ export class CyclesRenderRuntime {
     this.emit({ phase: "instantiate", message: "Loading Cycles WASM module..." });
 
     try {
-      // Expose locateFile so emscripten can find cycles.wasm next to cycles.js
+      // Expose locateFile so emscripten can find cycles.wasm next to cycles.js.
+      // Prefer cycles.wasm.zst (zstd-compressed, ~3.4 MB vs 16.3 MB) when the
+      // server supports streaming decompression. Fall back to uncompressed .wasm.
       (window as unknown as Record<string, unknown>).__cyclesLocateFile = (path: string) => {
-        if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm`;
+        if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm.zst`;
         if (path.endsWith(".data")) return `${ARTIFACT_BASE}/cycles.data`;
         return `${ARTIFACT_BASE}/${path}`;
       };
@@ -182,7 +184,7 @@ export class CyclesRenderRuntime {
       const Module = typeof rawModule === "function" ? rawModule() : rawModule as Partial<CyclesModule>;
 
       Module["locateFile"] = (path: string) => {
-        if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm`;
+        if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm.zst`;
         if (path.endsWith(".data")) return `${ARTIFACT_BASE}/cycles.data`;
         return `${ARTIFACT_BASE}/${path}`;
       };

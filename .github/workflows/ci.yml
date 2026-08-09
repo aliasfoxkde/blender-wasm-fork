@@ -30,6 +30,11 @@ jobs:
       - name: Run artifact audit
         run: pnpm audit:artifacts
 
+      - name: Validate shell script syntax
+        run: |
+          for f in scripts/*.sh; do bash -n "$f" || exit 1; done
+          echo "All shell scripts passed bash -n"
+
       - name: Install demo dependencies
         run: pnpm install --frozen-lockfile
         working-directory: demo

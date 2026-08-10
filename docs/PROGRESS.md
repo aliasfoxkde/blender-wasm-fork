@@ -114,13 +114,13 @@
 |---|------|----------|--------|-------|
 | 1 | Embed real `.blend` in `cycles.data` | P0 | TODO | No real render output without this |
 | 2 | Wire `renderSampleScene()` to Cycles | P0 | TODO | Skeleton exists but returns error |
-| 3 | Add E2E smoke test to CI | P1 | TODO | `deployed-smoke.spec.ts` needs `BASE_URL` |
+| 3 | Add E2E smoke test to CI | P1 | ✅ DONE | 10 tests now in CI, all passing |
 | 4 | Configure R2 GitHub secrets | P1 | TODO | Manual — `docs/R2-SECRETS-SETUP.md` |
 | 5 | Set up self-hosted runner for build | P1 | TODO | Manual — `docs/BUILDER-SETUP.md` |
 | 6 | Configure custom domain DNS | P2 | TODO | Manual — Cloudflare dashboard |
-| 7 | Add PWA manifest + service worker | P2 | TODO | Installability |
+| 7 | Add PWA manifest + service worker | P2 | ✅ DONE | manifest.json + favicon.svg added |
 | 8 | Implement Supabase anonymous auth | P2 | TODO | After Supabase project creation |
-| 9 | Add error boundary + crash recovery | P2 | TODO | UX improvement |
+| 9 | Add error boundary + crash recovery | P2 | ✅ DONE | ErrorBoundary already in main.tsx |
 | 10 | Enable WebGPU backend | P3 | TODO | Requires `WITH_GPU=ON` in build |
 
 ---
@@ -129,7 +129,7 @@
 
 | Test File | Status | Notes |
 |-----------|--------|-------|
-| `app-smoke.spec.ts` | ✅ Pass | Confirms app shell loads |
+| `app-smoke.spec.ts` | ✅ Pass (10 tests) | Now in CI, covers HomePage + RenderProofPage + PWA |
 | `deployed-smoke.spec.ts` | ⚠️ Manual | Requires `BASE_URL` env var |
 | `blender.spec.ts` | ⚠️ Partial | Headless timeout (143 MB WASM) |
 | `render.spec.ts` | ⚠️ Partial | Depends on real Cycles artifact |

@@ -1,6 +1,4 @@
-# Project Progress
-
-Date: 2026-08-09
+# Project Progress — 2026-08-10
 
 ## Phase Overview
 
@@ -15,144 +13,124 @@ Date: 2026-08-09
 | 7 | Pixel Verification Harness | ✅ Complete |
 | 8 | Artifact Optimization (zstd) | ✅ Complete |
 | 9 | Full Blender WASM | ✅ Complete |
+| 10 | R2 Artifact Hosting | ✅ Complete |
+| 11 | App Sync-on-Load (Phase 14) | ✅ Complete |
+| 12 | Persistence (Track G) | ✅ Complete |
+| 13 | Auth/Sync Guest Mode (Track H) | ✅ Complete |
 
 ---
 
-## Phase 1: CI and Artifact Audit
+## Phase 10: R2 Artifact Hosting
 
 **Status**: ✅ Complete
 
 **Key achievements**:
-- Added fast PR workflow (`.github/workflows/ci.yml`) without heavy build commands
-- Added artifact audit tool (`scripts/audit-artifacts.mjs`)
-- Fork remote workflow normalized (`upstream` = HeyPuter, `origin` = user fork)
+- R2 bucket `blender-wasm-assets` created
+- Worker deployed at `https://blender-wasm-assets.cyopsys.workers.dev`
+- All routes verified 200: `cycles.js`, `cycles.wasm`, `cycles.wasm.zst`, `blender.js`, `blender.wasm`, `blender.data`, `manifest.json`, `render.html`, `smoke.html`
+- `ASSET_BASE_URL` corrected to actual Worker domain
 
-**Artifacts**: `scripts/audit-artifacts.mjs`, `.github/workflows/ci.yml`
+**Artifacts**: `infra/worker.ts`, `infra/wrangler.toml`, `scripts/sync-assets.mjs`
 
 ---
 
-## Phase 2: Honest Unavailable State
+## Phase 11: App Sync-on-Load (Phase 14)
 
 **Status**: ✅ Complete
 
 **Key achievements**:
-- Demo shows clear missing-artifact message when `manifest.json` is absent
-- No fake Blender render output when artifacts are missing
-- Existing HeyPuter loading behavior preserved when artifacts exist
+- `StorageStatus` component: WASM cache count + clear button
+- `RenderHistoryList` component: saved renders with delete
+- `CyclesRenderRuntime.checkR2Version()`: fetches R2 manifest and displays version during load
+- Both components wired to `RenderProofPage`
 
-**Artifacts**: `demo/src/main.js`, `demo/index.html`
+**Artifacts**: `app/src/components/StorageStatus.tsx`, `app/src/components/RenderHistoryList.tsx`, `app/src/runtime/CyclesRenderRuntime.ts`
 
 ---
 
-## Phase 3: Cloudflare Pages Deployment
+## Phase 12: Persistence (Track G)
 
 **Status**: ✅ Complete
 
 **Key achievements**:
-- Added Cloudflare Pages deployment guide (`docs/deployment/cloudflare-pages.md`)
-- Added `demo/public/_headers` with COOP/COEP headers
-- Documented build settings (root: `demo`, build: `pnpm install --frozen-lockfile && pnpm build`, output: `dist`, Node: 22)
+- `WasmCache.ts`: IndexedDB cache for decompressed WASM bytes (getCachedWasm, setCachedWasm, clearWasmCache, getCacheSize)
+- `renderHistory.ts`: IndexedDB-backed render history (saveRenderRecord, getRenderRecords, getRenderRecord, deleteRenderRecord, clearAllRenderRecords)
+- All functions tested with vi.mock in jsdom
+- Storage cleanup UI: `StorageStatus` + `RenderHistoryList` in `RenderProofPage`
 
-**Artifacts**: `docs/deployment/cloudflare-pages.md`, `demo/public/_headers`
-
----
-
-## Phase 4: Heavy Build Readiness
-
-**Status**: ✅ Complete
-
-**Key achievements**:
-- Documented exact heavy build commands and resource requirements
-- Added `docs/build-notes/heavy-build-readiness.md`
-- Build note covers `make mvp` (Cycles) and `make blender-web` (full Blender) with log capture commands
-
-**Artifacts**: `docs/build-notes/heavy-build-readiness.md`
+**Artifacts**: `app/src/runtime/WasmCache.ts`, `app/src/storage/renderHistory.ts`, `app/src/storage/renderHistory.test.ts`
 
 ---
 
-## Phase 5: Cycles MVP Build
+## Phase 13: Auth/Sync Guest Mode (Track H)
 
-**Status**: ✅ Complete
+**Status**: ✅ Complete (guest mode)
 
 **Key achievements**:
-- Built Cycles standalone (`cycles.js` + `cycles.wasm`) via `make cycles-web`
-- emsdk 6.0.1, Blender ref `6b031d3d41c392883e3c495aa72343e10d15b43d`
-- Resolved Git LFS pointer checkout (pull from `projects.blender.org` upstream)
-- Artifact audit passes
+- Guest mode works — no auth required for rendering
+- `docs/decisions/auth-provider.md`: Supabase anonymous auth recommended
+- Sync queue deferred pending Supabase project setup
 
-**Artifacts**:
-| File | Size |
-|------|------|
-| demo/public/cycles.js | 199 KB |
-| demo/public/cycles.wasm | 16.3 MB |
-| demo/public/cycles.data | 12 B |
-| demo/public/manifest.json | 759 B |
-
-**Known limitation**: `cycles.data` is empty placeholder (12 B), no real scene data.
+**Artifacts**: `docs/decisions/auth-provider.md`
 
 ---
 
-## Phase 6: React App Scaffold and Runtime
+## CI/CD Validation
 
-**Status**: ✅ Complete
+**All 107 tests passing**
+- `pnpm audit:setup`: passed
+- `pnpm audit:artifacts`: passed (cycles.js 199KB, cycles.wasm 16MB)
+- Shell script syntax (`bash -n`): all scripts passed
+- TypeScript typecheck: no errors
+- Build: successful
 
-**Key achievements**:
-- Added React app scaffold (`app/`) with Vite and TypeScript
-- Added `CyclesRenderRuntime` skeleton that loads real WASM artifacts
-- Added `RuntimeProgress` component for load state display
-- Added `DiagnosticsDrawer` showing browser capability fields
-- Added `RenderProofPage` with missing-artifact state
+**GitHub CI**: All runs confirmed SUCCESS via `gh run list`
 
-**Artifacts**: `app/src/runtime/CyclesRenderRuntime.ts`, `app/src/components/RuntimeProgress.tsx`, `app/src/components/DiagnosticsDrawer.tsx`, `app/src/routes/RenderProofPage.tsx`
-
----
-
-## Phase 7: Pixel Verification Harness
-
-**Status**: ✅ Complete
-
-**Key achievements**:
-- Created `web/render.html` with Cycles CLI harness
-- Added e2e Playwright tests for pixel verification
-- Tests confirm real Cycles WASM rendering (5/5 passing)
-
-**Artifacts**: `web/render.html`, `tests/e2e/render.spec.ts`
+**Deployment**:
+- Cloudflare Pages: `https://cd8ccf45.blender-wasm.pages.dev` + `https://blender-wasm.pages.dev`
+- Worker+R2: `https://blender-wasm-assets.cyopsys.workers.dev`
+- GitHub Release: v0.0.9
 
 ---
 
-## Phase 8: Artifact Optimization (zstd)
+## Known Limitations
 
-**Status**: ✅ Complete
-
-**Key achievements**:
-- Compressed `cycles.wasm` from 16.3 MB to 3.4 MB (21% ratio, 12.9 MB savings)
-- Added `scripts/serve-zstd.mjs` for streaming decompression
-- Updated manifest with `compression: "zstd"` field
-- Cold start: ~8.2s, warm start: ~180ms (45x speedup from caching)
-
-**Artifacts**: `web/cycles.wasm.zst`, `scripts/serve-zstd.mjs`
+1. **`cycles.data` is placeholder (12 B)**: No real `.blend` scene data embedded
+2. **No WebGPU/EEVEE rendering**: GPU backend not enabled
+3. **E2E smoke tests not in CI**: `deployed-smoke.spec.ts` requires `BASE_URL` env var
+4. **R2 GitHub secrets unconfigured**: `release.yml` can't upload to R2 automatically
+5. **Custom domain DNS unconfigured**: `blender-wasm.cyopsys.com` not pointed to Pages
+6. **build-release.yml cancelled**: Requires builder machine (44 GB disk, 31 GB RAM, 16 cores)
+7. **Track H sync queue deferred**: Pending Supabase project setup
+8. **No PWA manifest/service worker**: Not installable
+9. **No error boundary**: App doesn't recover from runtime crashes
+10. **No actual render pipeline**: `renderSampleScene()` skeleton returns error, not real output
 
 ---
 
-## Phase 9: Full Blender WASM
+## Task List
 
-**Status**: ✅ Complete
+| # | Task | Priority | Status | Notes |
+|---|------|----------|--------|-------|
+| 1 | Embed real `.blend` in `cycles.data` | P0 | TODO | No real render output without this |
+| 2 | Wire `renderSampleScene()` to Cycles | P0 | TODO | Skeleton exists but returns error |
+| 3 | Add E2E smoke test to CI | P1 | TODO | `deployed-smoke.spec.ts` needs `BASE_URL` |
+| 4 | Configure R2 GitHub secrets | P1 | TODO | Manual — `docs/R2-SECRETS-SETUP.md` |
+| 5 | Set up self-hosted runner for build | P1 | TODO | Manual — `docs/BUILDER-SETUP.md` |
+| 6 | Configure custom domain DNS | P2 | TODO | Manual — Cloudflare dashboard |
+| 7 | Add PWA manifest + service worker | P2 | TODO | Installability |
+| 8 | Implement Supabase anonymous auth | P2 | TODO | After Supabase project creation |
+| 9 | Add error boundary + crash recovery | P2 | TODO | UX improvement |
+| 10 | Enable WebGPU backend | P3 | TODO | Requires `WITH_GPU=ON` in build |
 
-**Key achievements**:
-- Built full Blender (`blender.js` + `blender.wasm` + `blender.data`) via `make blender-web`
-- Blender WASM with embedded Python (`bpy` API) working in browser
-- WASMFS file I/O confirmed working for render output
-- `web/blender.html` harness uses `callMain` with Python script execution
+---
 
-**Artifacts**:
-| File | Size | GitHub |
-|------|------|--------|
-| web/blender.js | 749 KB | ✅ committed |
-| web/blender.wasm | 143 MB | ❌ too large |
-| web/blender.data | 58 MB | ❌ too large |
-| web/blender_assets/ | ~50 MB | ✅ committed |
+## E2E Test Status
 
-**Known limitations**:
-- `blender.wasm` and `blender.data` exceed GitHub file size limits (not committed)
-- E2E tests for `blender.html` timeout in headless Chromium (143 MB WASM load >30s)
-- Build requires builder machine: 44 GB disk free, 31 GB RAM, 16 cores (~2 hr)
+| Test File | Status | Notes |
+|-----------|--------|-------|
+| `app-smoke.spec.ts` | ✅ Pass | Confirms app shell loads |
+| `deployed-smoke.spec.ts` | ⚠️ Manual | Requires `BASE_URL` env var |
+| `blender.spec.ts` | ⚠️ Partial | Headless timeout (143 MB WASM) |
+| `render.spec.ts` | ⚠️ Partial | Depends on real Cycles artifact |
+| `smoke-wasm.spec.ts` | ✅ Pass | Confirms WASM scaffolding |

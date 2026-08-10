@@ -43,7 +43,10 @@ interface CyclesModule {
   locateFile: (path: string) => string;
 }
 
-const ARTIFACT_BASE = "/demo/public";
+// Artifact base URL — set via VITE_ARTIFACT_BASE env var at build time.
+// Fallback: local demo/public (for local development).
+// In production (Cloudflare Pages), set to the R2 Worker URL.
+const ARTIFACT_BASE = import.meta.env.VITE_ARTIFACT_BASE ?? "/demo/public";
 const WASMFS_OUT = "/out";
 
 export class CyclesRenderRuntime {

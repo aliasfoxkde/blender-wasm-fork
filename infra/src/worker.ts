@@ -68,9 +68,19 @@ export default {
       return serveFromR2(env, path, mimeType(path));
     }
 
+    // HTML entry points served from root level (not app/ prefix)
+    if (path === "render.html" || path === "smoke.html") {
+      return serveFromR2(env, path, mimeType(path));
+    }
+
     if (path.startsWith("blender/") || path.startsWith("blender.")) {
-      const r2Key = path.startsWith("blender/") ? path : `blender/${path.replace("blender.", "")}`;
-      return serveFromR2(env, r2Key, mimeType(path));
+      // Try blender/ prefixed key first, then fall back to root-level key
+      const prefixedKey = path.startsWith("blender/") ? path : `blender/${path}`;
+      const prefixedObject = await env.ASSETS.get(prefixedKey);
+      if (prefixedObject) return buildResponse(prefixedObject, mimeType(path));
+
+      // Fallback: root-level key (e.g. blender.js uploaded as blender.js)
+      return serveFromR2(env, path, mimeType(path));
     }
 
     // App routes — serve from R2 app/ prefix
@@ -91,6 +101,11 @@ async function serveFromR2(env: Env, key: string, contentType: string): Promise<
     });
   }
 
+  return buildResponse(r2Object, contentType);
+}
+
+function buildResponse(r2Object: R2Object, contentType: string): Response {
+  const key = r2Object.key;
   const headers: Record<string, string> = {
     "Content-Type": contentType,
     "Cross-Origin-Opener-Policy": "same-origin",

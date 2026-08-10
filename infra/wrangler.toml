@@ -9,4 +9,4 @@ bucket_name = "blender-wasm-assets"
 
 [vars]
 # Base URL where this worker is deployed (e.g. https://blender-wasm-assets.yourname.workers.dev)
-ASSET_BASE_URL = "https://blender-wasm-assets.yourname.workers.dev"
+ASSET_BASE_URL = "https://blender-wasm-assets.cyopsys.workers.dev"

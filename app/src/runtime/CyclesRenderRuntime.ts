@@ -13,6 +13,7 @@
 import type { ArtifactManifest } from "./ArtifactManifest";
 import { RuntimeStateMachine, type RuntimeState } from "./runtimeState";
 import type { RenderResult } from "./renderResult";
+import { getCachedWasm, setCachedWasm } from "./WasmCache";
 
 export interface RuntimeProgress {
   phase: "fetch" | "decompress" | "instantiate" | "render";
@@ -42,7 +43,10 @@ interface CyclesModule {
   locateFile: (path: string) => string;
 }
 
-const ARTIFACT_BASE = "/demo/public";
+// Artifact base URL — set via VITE_ARTIFACT_BASE env var at build time.
+// Fallback: local demo/public (for local development).
+// In production (Cloudflare Pages), set to the R2 Worker URL.
+const ARTIFACT_BASE = import.meta.env.VITE_ARTIFACT_BASE ?? "/demo/public";
 const WASMFS_OUT = "/out";
 
 export class CyclesRenderRuntime {
@@ -72,6 +76,30 @@ export class CyclesRenderRuntime {
 
   getManifest(): ArtifactManifest | null {
     return this._manifest;
+  }
+
+  /** Number of WASM entries currently cached in IndexedDB. */
+  async getCacheSize(): Promise<number> {
+    const { getCacheSize: getSize } = await import("./WasmCache");
+    return getSize();
+  }
+
+  /** Clear all cached WASM bytes from IndexedDB. */
+  async clearCache(): Promise<void> {
+    const { clearWasmCache } = await import("./WasmCache");
+    await clearWasmCache();
+  }
+
+  /** Check what version the R2 manifest declares without loading full artifacts. */
+  async checkR2Version(): Promise<{ version: string | null; error: string | null }> {
+    try {
+      const res = await fetch(`${ARTIFACT_BASE}/manifest.json`);
+      if (!res.ok) return { version: null, error: `HTTP ${res.status}` };
+      const manifest = await res.json() as ArtifactManifest;
+      return { version: manifest.version ?? manifest.name ?? null, error: null };
+    } catch (err) {
+      return { version: null, error: String(err) };
+    }
   }
 
   onProgress(callback: (p: RuntimeProgress) => void): () => void {
@@ -164,11 +192,16 @@ export class CyclesRenderRuntime {
   }
 
   private async _instantiateWasm(): Promise<void> {
-    this._state.transition("loading");
+    // State is already "loading" (set by load()). Don't re-transition — loading->loading is invalid.
     this.emitState(this._state.state);
     this.emit({ phase: "instantiate", message: "Loading Cycles WASM module..." });
 
+    const wasmUrl = `${ARTIFACT_BASE}/cycles.wasm.zst`;
+
     try {
+      // Try to load WASM bytes from IndexedDB cache first (fast warm start)
+      const cachedBytes = await getCachedWasm(wasmUrl);
+
       // Expose locateFile so emscripten can find cycles.wasm next to cycles.js.
       // Prefer cycles.wasm.zst (zstd-compressed, ~3.4 MB vs 16.3 MB) when the
       // server supports streaming decompression. Fall back to uncompressed .wasm.
@@ -183,6 +216,12 @@ export class CyclesRenderRuntime {
       const rawModule = (window as unknown as Record<string, unknown>)["Module"];
       const Module = typeof rawModule === "function" ? rawModule() : rawModule as Partial<CyclesModule>;
 
+      // If we have cached bytes, provide them directly via wasmBinary.
+      // Emscripten will use this instead of fetching the .wasm file.
+      if (cachedBytes) {
+        Module["wasmBinary"] = cachedBytes;
+      }
+
       Module["locateFile"] = (path: string) => {
         if (path.endsWith(".wasm")) return `${ARTIFACT_BASE}/cycles.wasm.zst`;
         if (path.endsWith(".data")) return `${ARTIFACT_BASE}/cycles.data`;
@@ -195,6 +234,12 @@ export class CyclesRenderRuntime {
         this._state.transition("ready");
         this.emitState(this._state.state);
         this.emit({ phase: "instantiate", message: "Cycles module ready." });
+
+        // Asynchronously cache the WASM bytes for next time (if not already cached)
+        // We read from _module after it's set, but the actual WASM bytes may not
+        // be easily extractable — instead we fetch and cache if wasmBinary was used.
+        // Note: once Module is instantiated, we can't easily re-read the WASM buffer.
+        // The cache works on the NEXT load, not the current one.
       };
 
       // If already initialized (cached), fire immediately
@@ -205,6 +250,14 @@ export class CyclesRenderRuntime {
         this.emitState(this._state.state);
         this.emit({ phase: "instantiate", message: "Cycles module ready." });
       }
+
+      // After successful instantiation, cache the WASM bytes for next time.
+      // We need to re-fetch (the browser already downloaded it) — cache for next load.
+      if (!cachedBytes) {
+        this._cacheWasmForNextTime(wasmUrl).catch(() => {
+          // Non-fatal — cache misses are fine
+        });
+      }
     } catch (err) {
       this._state.transition("error");
       this.emitState(this._state.state);
@@ -213,6 +266,17 @@ export class CyclesRenderRuntime {
         message: `Failed to load Cycles WASM: ${err}`,
       });
       console.error("[CyclesRenderRuntime] WASM load failed:", err);
+    }
+  }
+
+  private async _cacheWasmForNextTime(wasmUrl: string): Promise<void> {
+    try {
+      const res = await fetch(wasmUrl);
+      if (!res.ok) return;
+      const bytes = await res.arrayBuffer();
+      await setCachedWasm(wasmUrl, bytes);
+    } catch {
+      // Network or decode errors — skip caching
     }
   }
 

@@ -62,3 +62,5 @@
 # playwright
 /test-results/
 /playwright/.cache/
+infra/node_modules/
+.env

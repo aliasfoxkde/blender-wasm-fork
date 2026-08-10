@@ -1,0 +1,72 @@
+git init -q blender
+bash scripts/build_all_deps.sh
+node scripts/verify.mjs render.html "RENDER OK"
+git -C blender remote add origin https://github.com/HeyPuter/blender 2>/dev/null || true
+GIT_LFS_SKIP_SMUDGE=1 git -C blender fetch --depth 1 origin 6b031d3d41c392883e3c495aa72343e10d15b43d
+==== wave: foundational ====
+node:events:487
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8091
+    at Server.setupListenHandle [as _listen2] (node:net:2008:16)
+    at listenInCluster (node:net:2065:12)
+    at Server.listen (node:net:2170:7)
+    at file:///nas/Temp/repos/blender-wasm-fork/scripts/serve.mjs:45:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:2044:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 8091
+}
+
+Node.js v24.16.0
+[browser] Failed to load resource: the server responded with a status of 404 (Not Found)
+From https://github.com/HeyPuter/blender
+ * branch              6b031d3d41c392883e3c495aa72343e10d15b43d -> FETCH_HEAD
+# Skip LFS smudge on checkout: the fork's GitHub LFS storage does NOT host the
+# LFS objects (forks don't inherit LFS), so smudging every pointer 404s and
+# aborts the checkout. Check out pointers; the real objects are pulled from
+# upstream by content hash in `blender-assets` below.
+GIT_LFS_SKIP_SMUDGE=1 git -C blender checkout -q --detach FETCH_HEAD
+>> blender at 6b031d3d
+  ok   zlib
+  ok   fmt
+  ok   imath
+  ok   zstd
+  ok   jpeg
+  ok   libdeflate
+  ok   robinmap
+  ok   yamlcpp
+  ok   expat
+  ok   pystring
+  ok   tbb
+  ok   eigen
+  ok   pugixml
+  ok   brotli
+==== wave: mid ====
+  ok   png
+  ok   minizip
+  ok   openjph
+  ok   tiff
+==== wave: text ====
+  ok   freetype
+==== wave: openexr ====
+VERIFY FAIL: page.waitForFunction: Timeout 180000ms exceeded.
+page status: undefined | title: 404 Not Found
+---- page log ----
+(empty)
+make: *** [Makefile:202: verify-render] Error 1
+make: *** Waiting for unfinished jobs....
+  ok   openexr
+==== wave: ocio ====
+  ok   ocio
+==== wave: oiio ====
+  ok   oiio
+==== wave: tint ====

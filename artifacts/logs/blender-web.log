@@ -1,0 +1,7 @@
+bash scripts/link_blender_web.sh
+>> staging assets -> /nas/Temp/repos/blender-wasm-fork/web/blender_assets
+OCIO trimmed
+>>   scripts=14M datafiles=38M py=11M
+>> relinking blender → /nas/Temp/repos/blender-wasm-fork/web/blender.js (web + WebGPU)
+em++: error: source/creator/CMakeFiles/blender.dir/creator.cc.o: No such file or directory ("source/creator/CMakeFiles/blender.dir/creator.cc.o" was expected to be an input file, based on the commandline arguments provided)
+make: *** [Makefile:174: blender-web] Error 1

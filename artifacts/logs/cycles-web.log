@@ -1,0 +1,542 @@
+bash scripts/build_all_deps.sh
+==== wave: foundational ====
+  ok   zlib
+  ok   fmt
+  ok   imath
+  ok   zstd
+  ok   jpeg
+  ok   libdeflate
+  ok   robinmap
+  ok   yamlcpp
+  ok   expat
+  ok   pystring
+  ok   tbb
+  ok   eigen
+  ok   pugixml
+  ok   brotli
+==== wave: mid ====
+  ok   png
+  ok   minizip
+  ok   openjph
+  ok   tiff
+==== wave: text ====
+  ok   freetype
+==== wave: openexr ====
+  ok   openexr
+==== wave: ocio ====
+  ok   ocio
+==== wave: oiio ====
+  ok   oiio
+==== wave: tint ====
+  ok   tint
+==== wave: spirv ====
+  ok   spirv_tools
+==== wave: shaderc ====
+  ok   shaderc
+==== all deps built into wasm-sysroot ====
+wasm-sysroot/lib/libbrotlicommon.a
+wasm-sysroot/lib/libbrotlidec.a
+wasm-sysroot/lib/libbrotlienc.a
+wasm-sysroot/lib/libdeflate.a
+wasm-sysroot/lib/libexpat.a
+wasm-sysroot/lib/libfmt.a
+wasm-sysroot/lib/libfreetype.a
+wasm-sysroot/lib/libGenericCodeGen.a
+wasm-sysroot/lib/libglslang.a
+wasm-sysroot/lib/libglslang-default-resource-limits.a
+wasm-sysroot/lib/libIex-3_4.a
+wasm-sysroot/lib/libIlmThread-3_4.a
+wasm-sysroot/lib/libImath-3_2.a
+wasm-sysroot/lib/libjpeg.a
+wasm-sysroot/lib/libMachineIndependent.a
+wasm-sysroot/lib/libminizip-ng.a
+wasm-sysroot/lib/libOpenColorIO.a
+wasm-sysroot/lib/libOpenEXR-3_4.a
+wasm-sysroot/lib/libOpenEXRCore-3_4.a
+wasm-sysroot/lib/libOpenEXRUtil-3_4.a
+wasm-sysroot/lib/libOpenImageIO.a
+wasm-sysroot/lib/libOpenImageIO_Util.a
+wasm-sysroot/lib/libopenjph.a
+wasm-sysroot/lib/libOSDependent.a
+wasm-sysroot/lib/libpng16.a
+wasm-sysroot/lib/libpng.a
+wasm-sysroot/lib/libpugixml.a
+wasm-sysroot/lib/libpystring.a
+wasm-sysroot/lib/libshaderc.a
+wasm-sysroot/lib/libshaderc_combined.a
+wasm-sysroot/lib/libSPIRV.a
+wasm-sysroot/lib/libSPIRV-Tools.a
+wasm-sysroot/lib/libSPIRV-Tools-diff.a
+wasm-sysroot/lib/libSPIRV-Tools-link.a
+wasm-sysroot/lib/libSPIRV-Tools-lint.a
+wasm-sysroot/lib/libSPIRV-Tools-opt.a
+wasm-sysroot/lib/libSPIRV-Tools-reduce.a
+wasm-sysroot/lib/libtbb.a
+wasm-sysroot/lib/libtbbmalloc.a
+wasm-sysroot/lib/libtiff.a
+wasm-sysroot/lib/libtiffxx.a
+wasm-sysroot/lib/libyaml-cpp.a
+wasm-sysroot/lib/libz.a
+wasm-sysroot/lib/libzstd.a
+export PATH="/nas/Temp/repos/blender-wasm-fork/emsdk/upstream/emscripten:$PATH"; "/nas/Temp/repos/blender-wasm-fork/emsdk/upstream/emscripten/emcmake" cmake -S blender -B /nas/Temp/repos/blender-wasm-fork/build-cycles -G Ninja \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_PREFIX_PATH="/nas/Temp/repos/blender-wasm-fork/wasm-sysroot" \
+	-DCMAKE_FIND_ROOT_PATH="/nas/Temp/repos/blender-wasm-fork/wasm-sysroot" \
+	-DCMAKE_C_FLAGS="-pthread -fexceptions -include /nas/Temp/repos/blender-wasm-fork/cmake/wasm_compat.h" \
+	-DCMAKE_CXX_FLAGS="-pthread -fexceptions -include /nas/Temp/repos/blender-wasm-fork/cmake/wasm_compat.h" \
+	-C /nas/Temp/repos/blender-wasm-fork/cmake/cycles-wasm-cache.cmake
+emcmake: cmake -S blender -B /nas/Temp/repos/blender-wasm-fork/build-cycles -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/nas/Temp/repos/blender-wasm-fork/wasm-sysroot -DCMAKE_FIND_ROOT_PATH=/nas/Temp/repos/blender-wasm-fork/wasm-sysroot '-DCMAKE_C_FLAGS=-pthread -fexceptions -include /nas/Temp/repos/blender-wasm-fork/cmake/wasm_compat.h' '-DCMAKE_CXX_FLAGS=-pthread -fexceptions -include /nas/Temp/repos/blender-wasm-fork/cmake/wasm_compat.h' -C /nas/Temp/repos/blender-wasm-fork/cmake/cycles-wasm-cache.cmake -DCMAKE_TOOLCHAIN_FILE=/nas/Temp/repos/blender-wasm-fork/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_CROSSCOMPILING_EMULATOR=/nas/Temp/repos/blender-wasm-fork/emsdk/node/24.19.0_64bit/bin/node in directory /nas/Temp/repos/blender-wasm-fork
+loading initial cache file /nas/Temp/repos/blender-wasm-fork/cmake/cycles-wasm-cache.cmake
+-- Looking for malloc_stats
+-- Looking for malloc_stats - found
+-- Looking for include file execinfo.h
+-- Looking for include file execinfo.h - not found
+-- WITH_AUDASPACE is disabled, setting WITH_RUBBERBAND=OFF
+-- WITH_PYTHON is disabled, setting WITH_CYCLES=OFF
+-- WITH_FFTW3 is disabled, setting WITH_MOD_OCEANSIM=OFF
+-- Found Git: /usr/bin/git (found version "2.47.3")
+-- Found JPEG: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libjpeg.a (found version "62")
+-- Found ZLIB: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libz.a (found version "1.3.1")
+-- Found PNG: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libpng.a (found version "1.6.58")
+-- Found Zstd: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libzstd.a
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found PugiXML: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libpugixml.a
+-- WebP not found, disabling WITH_IMAGE_WEBP
+-- Found TIFF: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/cmake/tiff (found version "4.7.1")
+-- Found expat: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/include (found suitable version "2.7.5", minimum required is "2.7.5")
+-- Found pystring: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/include/pystring
+-- Found yaml-cpp: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libyaml-cpp.a (found suitable version "0.8.0", minimum required is "0.8.0")
+-- Found minizip-ng: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/libminizip-ng.a (found suitable version "4.0.10", minimum required is "4.0.10")
+-- Found OpenColorIO: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/cmake/OpenColorIO/OpenColorIOConfig.cmake (found version "2.5.0")
+-- Found OpenColorIO: /nas/Temp/repos/blender-wasm-fork/wasm-sysroot/lib/cmake/OpenColorIO/OpenColorIOConfig.cmake (found suitable version "2.5.0", minimum required is "2.0.0")
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1")
+-- Checking for module 'libpipewire-0.3>=1.1.0'
+--   Package 'libpipewire-0.3', required by 'virtual:world', not found
+-- PipeWire not found, disabling WITH_PIPEWIRE
+-- The "mold" binary could not be found, using system linker.
+-- The "ld.lld" binary could not be found, using system linker.
+-- Performing Test ATOMIC_OPS_WITH_LIBATOMIC
+-- Performing Test ATOMIC_OPS_WITH_LIBATOMIC - Failed
+-- Using NINJA_POOL_JOBS:
+--   NINJA_MAX_NUM_PARALLEL_LINK_JOBS: max concurrent linking jobs (computed): 2
+--   NINJA_MAX_NUM_PARALLEL_COMPILE_HEAVY_JOBS: max concurrent heavy compile jobs (computed): 12
+--   NINJA_MAX_NUM_PARALLEL_COMPILE_JOBS: max concurrent regular compile jobs (computed): 13
+-- Performing Test C_WARN_ALL
+-- Performing Test C_WARN_ALL - Success
+-- Performing Test C_WARN_ERROR_IMPLICIT_FUNCTION_DECLARATION
+-- Performing Test C_WARN_ERROR_IMPLICIT_FUNCTION_DECLARATION - Success
+-- Performing Test C_WARN_ERROR_RETURN_TYPE
+-- Performing Test C_WARN_ERROR_RETURN_TYPE - Success
+-- Performing Test C_WARN_NO_AUTOLOGICAL_COMPARE
+-- Performing Test C_WARN_NO_AUTOLOGICAL_COMPARE - Success
+-- Performing Test C_WARN_NO_UNKNOWN_PRAGMAS
+-- Performing Test C_WARN_NO_UNKNOWN_PRAGMAS - Success
+-- Performing Test C_WARN_NO_CHAR_SUBSCRIPTS
+-- Performing Test C_WARN_NO_CHAR_SUBSCRIPTS - Success
+-- Performing Test C_WARN_STRICT_PROTOTYPES
+-- Performing Test C_WARN_STRICT_PROTOTYPES - Success
+-- Performing Test C_WARN_MISSING_PROTOTYPES
+-- Performing Test C_WARN_MISSING_PROTOTYPES - Success
+-- Performing Test C_WARN_UNUSED_PARAMETER
+-- Performing Test C_WARN_UNUSED_PARAMETER - Success
+-- Performing Test C_WARN_UNDEF
+-- Performing Test C_WARN_UNDEF - Success
+-- Performing Test C_WARN_UNDEF_PREFIX
+-- Performing Test C_WARN_UNDEF_PREFIX - Success
+-- Performing Test C_WARN_ERROR_UNGUARDED_AVAILABILITY_NEW
+-- Performing Test C_WARN_ERROR_UNGUARDED_AVAILABILITY_NEW - Success
+-- Performing Test CXX_WARN_ALL
+-- Performing Test CXX_WARN_ALL - Success
+-- Performing Test CXX_WARN_NO_AUTOLOGICAL_COMPARE
+-- Performing Test CXX_WARN_NO_AUTOLOGICAL_COMPARE - Success
+-- Performing Test CXX_WARN_NO_UNKNOWN_PRAGMAS
+-- Performing Test CXX_WARN_NO_UNKNOWN_PRAGMAS - Success
+-- Performing Test CXX_WARN_NO_CHAR_SUBSCRIPTS
+-- Performing Test CXX_WARN_NO_CHAR_SUBSCRIPTS - Success
+-- Performing Test CXX_WARN_NO_OVERLOADED_VIRTUAL
+-- Performing Test CXX_WARN_NO_OVERLOADED_VIRTUAL - Success
+-- Performing Test CXX_WARN_NO_SIGN_COMPARE
+-- Performing Test CXX_WARN_NO_SIGN_COMPARE - Success
+-- Performing Test CXX_WARN_NO_INVALID_OFFSETOF
+-- Performing Test CXX_WARN_NO_INVALID_OFFSETOF - Success
+-- Performing Test CXX_WARN_NO_SUGGEST_OVERRIDE
+-- Performing Test CXX_WARN_NO_SUGGEST_OVERRIDE - Success
+-- Performing Test CXX_WARN_UNDEF
+-- Performing Test CXX_WARN_UNDEF - Success
+-- Performing Test CXX_WARN_UNDEF_PREFIX
+-- Performing Test CXX_WARN_UNDEF_PREFIX - Success
+-- Performing Test CXX_WARN_UNUSED_PARAMETER
+-- Performing Test CXX_WARN_UNUSED_PARAMETER - Success
+-- Performing Test CXX_WARN_MISMATCHED_TAGS
+-- Performing Test CXX_WARN_MISMATCHED_TAGS - Success
+-- Performing Test CXX_WARN_ERROR_UNGUARDED_AVAILABILITY_NEW
+-- Performing Test CXX_WARN_ERROR_UNGUARDED_AVAILABILITY_NEW - Success
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_PARAMETER
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_PARAMETER - Success
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_VARIABLE
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_VARIABLE - Success
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_MACROS
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_MACROS - Success
+-- Performing Test C_AND_CXX_WARN_NO_MISLEADING_INDENTATION
+-- Performing Test C_AND_CXX_WARN_NO_MISLEADING_INDENTATION - Success
+-- Performing Test C_AND_CXX_WARN_NO_MISSING_VARIABLE_DECLARATIONS
+-- Performing Test C_AND_CXX_WARN_NO_MISSING_VARIABLE_DECLARATIONS - Success
+-- Performing Test C_AND_CXX_WARN_NO_INCOMPAT_PTR_DISCARD_QUAL
+-- Performing Test C_AND_CXX_WARN_NO_INCOMPAT_PTR_DISCARD_QUAL - Success
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_FUNCTION
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_FUNCTION - Success
+-- Performing Test C_AND_CXX_WARN_NO_INT_TO_VOID_POINTER_CAST
+-- Performing Test C_AND_CXX_WARN_NO_INT_TO_VOID_POINTER_CAST - Success
+-- Performing Test C_AND_CXX_WARN_NO_MISSING_PROTOTYPES
+-- Performing Test C_AND_CXX_WARN_NO_MISSING_PROTOTYPES - Success
+-- Performing Test C_AND_CXX_WARN_NO_DUPLICATE_ENUM
+-- Performing Test C_AND_CXX_WARN_NO_DUPLICATE_ENUM - Success
+-- Performing Test C_AND_CXX_WARN_NO_UNDEF
+-- Performing Test C_AND_CXX_WARN_NO_UNDEF - Success
+-- Performing Test C_AND_CXX_WARN_NO_MISSING_NORETURN
+-- Performing Test C_AND_CXX_WARN_NO_MISSING_NORETURN - Success
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_BUT_SET_VARIABLE
+-- Performing Test C_AND_CXX_WARN_NO_UNUSED_BUT_SET_VARIABLE - Success
+-- Performing Test C_AND_CXX_WARN_NO_DEPRECATED_DECLARATIONS
+-- Performing Test C_AND_CXX_WARN_NO_DEPRECATED_DECLARATIONS - Success
+-- Performing Test C_AND_CXX_WARN_NO_STRICT_PROTOTYPES
+-- Performing Test C_AND_CXX_WARN_NO_STRICT_PROTOTYPES - Success
+-- Performing Test C_AND_CXX_WARN_NO_BITWISE_INSTEAD_OF_LOGICAL
+-- Performing Test C_AND_CXX_WARN_NO_BITWISE_INSTEAD_OF_LOGICAL - Success
+-- Performing Test C_AND_CXX_WARN_NO_IMPLICIT_CONST_INT_FLOAT_CONVERSION
+-- Performing Test C_AND_CXX_WARN_NO_IMPLICIT_CONST_INT_FLOAT_CONVERSION - Success
+-- Performing Test C_AND_CXX_WARN_NO_SINGLE_BIT_BITFIELD_CONSTANT_CONVERSION
+-- Performing Test C_AND_CXX_WARN_NO_SINGLE_BIT_BITFIELD_CONSTANT_CONVERSION - Success
+-- Performing Test CXX_WARN_NO_NONTRIVIAL_MEMCALL
+-- Performing Test CXX_WARN_NO_NONTRIVIAL_MEMCALL - Success
+-- Performing Test CXX_WARN_NO_UNUSED_PARAMETER
+-- Performing Test CXX_WARN_NO_UNUSED_PARAMETER - Success
+-- Performing Test CXX_WARN_NO_UNUSED_PRIVATE_FIELD
+-- Performing Test CXX_WARN_NO_UNUSED_PRIVATE_FIELD - Success
+-- Performing Test CXX_WARN_NO_CXX11_NARROWING
+-- Performing Test CXX_WARN_NO_CXX11_NARROWING - Success
+-- Performing Test CXX_WARN_NO_NON_VIRTUAL_DTOR
+-- Performing Test CXX_WARN_NO_NON_VIRTUAL_DTOR - Success
+-- Performing Test CXX_WARN_NO_UNUSED_MACROS
+-- Performing Test CXX_WARN_NO_UNUSED_MACROS - Success
+-- Performing Test CXX_WARN_NO_UNUSED_VARIABLE
+-- Performing Test CXX_WARN_NO_UNUSED_VARIABLE - Success
+-- Performing Test CXX_WARN_NO_REORDER
+-- Performing Test CXX_WARN_NO_REORDER - Success
+-- Performing Test CXX_WARN_NO_COMMENT
+-- Performing Test CXX_WARN_NO_COMMENT - Success
+-- Performing Test CXX_WARN_NO_UNUSED_TYPEDEFS
+-- Performing Test CXX_WARN_NO_UNUSED_TYPEDEFS - Success
+-- Performing Test CXX_WARN_NO_UNDEFINED_VAR_TEMPLATE
+-- Performing Test CXX_WARN_NO_UNDEFINED_VAR_TEMPLATE - Success
+-- Performing Test CXX_WARN_NO_INSTANTIATION_AFTER_SPECIALIZATION
+-- Performing Test CXX_WARN_NO_INSTANTIATION_AFTER_SPECIALIZATION - Success
+-- Performing Test CXX_WARN_NO_MISLEADING_INDENTATION
+-- Performing Test CXX_WARN_NO_MISLEADING_INDENTATION - Success
+-- Performing Test CXX_WARN_NO_BITWISE_INSTEAD_OF_LOGICAL
+-- Performing Test CXX_WARN_NO_BITWISE_INSTEAD_OF_LOGICAL - Success
+-- Performing Test CXX_WARN_NO_IMPLICIT_CONST_INT_FLOAT_CONVERSION
+-- Performing Test CXX_WARN_NO_IMPLICIT_CONST_INT_FLOAT_CONVERSION - Success
+-- Performing Test CXX_WARN_NO_UNDEF
+-- Performing Test CXX_WARN_NO_UNDEF - Success
+-- Performing Test CXX_WARN_NO_UNDEF_PREFIX
+-- Performing Test CXX_WARN_NO_UNDEF_PREFIX - Success
+-- Performing Test CXX_WARN_NO_INCONSISTENT_MISSING_OVERRIDE
+-- Performing Test CXX_WARN_NO_INCONSISTENT_MISSING_OVERRIDE - Success
+-- Performing Test C_MACRO_PREFIX_MAP
+-- Performing Test C_MACRO_PREFIX_MAP - Success
+-- Performing Test CXX_MACRO_PREFIX_MAP
+-- Performing Test CXX_MACRO_PREFIX_MAP - Success
+-- Performing Test CXX_HAS_SSE42
+-- Performing Test CXX_HAS_SSE42 - Failed
+-- Performing Test CXX_HAS_AVX2
+-- Performing Test CXX_HAS_AVX2 - Failed
+-- Performing Test CXX_HAS_F16C
+-- Performing Test CXX_HAS_F16C - Failed
+-- Performing Test _has_no_error_unused_macros
+-- Performing Test _has_no_error_unused_macros - Success
+-- Performing Test _has_cxxflag_float_conversion
+-- Performing Test _has_cxxflag_float_conversion - Success
+-- Performing Test _has_cxxflag_double_promotion
+-- Performing Test _has_cxxflag_double_promotion - Success
+-- Tests: Using Python executable: /usr/bin/python3
+-- C Compiler:   "Clang"
+-- C++ Compiler: "Clang"
+-- 
+Blender Configuration
+=====================
+
+  Build Options:
+  - WITH_ALEMBIC                        OFF
+  - WITH_BULLET                         OFF
+  - WITH_CLANG                          OFF
+  - WITH_CYCLES                         OFF
+  - WITH_FFTW3                          OFF
+  - WITH_FREESTYLE                      ON
+  - WITH_GMP                            OFF
+  - WITH_HARU                           OFF
+  - WITH_IK_ITASC                       ON
+  - WITH_IK_SOLVER                      ON
+  - WITH_INPUT_NDOF                     OFF
+  - WITH_INPUT_IME                      OFF
+  - WITH_INTERNATIONAL                  OFF
+  - WITH_MANIFOLD                       OFF
+  - WITH_OPENIMAGEDENOISE               OFF
+  - WITH_OPENSUBDIV                     OFF
+  - WITH_OPENVDB                        OFF
+  - WITH_POTRACE                        OFF
+  - WITH_PUGIXML                        ON
+  - WITH_QUADRIFLOW                     OFF
+  - WITH_TBB                            ON
+  - WITH_USD                            OFF
+  - WITH_MATERIALX                      OFF
+  - WITH_XR_OPENXR                      OFF
+
+  Compiler Options:
+  - WITH_BUILDINFO                      ON
+  - WITH_OPTIMIZED_BUILD_TOOLS          ON
+
+  System Options:
+  - WITH_INSTALL_PORTABLE               ON
+  - WITH_TBB_MALLOC_PROXY               OFF
+  - WITH_MEM_VALGRIND                   OFF
+
+  GHOST Options:
+  - WITH_GHOST_DEBUG                    OFF
+  - WITH_GHOST_SDL                      OFF
+  - WITH_GHOST_X11                      OFF
+  - WITH_GHOST_WAYLAND                  OFF
+
+  Profiling Options:
+  - WITH_TRACY                          OFF
+
+  Image Formats:
+  - WITH_IMAGE_CINEON                   ON
+  - WITH_IMAGE_OPENJPEG                 OFF
+
+  Audio:
+  - WITH_AUDASPACE                      OFF
+  - WITH_RUBBERBAND                     OFF
+  - WITH_CODEC_FFMPEG                   OFF
+  - WITH_CODEC_SNDFILE                  OFF
+  - WITH_COREAUDIO                      OFF
+  - WITH_JACK                           OFF
+  - WITH_JACK_DYNLOAD                   OFF
+  - WITH_OPENAL                         OFF
+  - WITH_PULSEAUDIO                     OFF
+  - WITH_PULSEAUDIO_DYNLOAD             OFF
+  - WITH_SDL_AUDIO                      OFF
+  - WITH_WASAPI                         OFF
+
+  Modifiers:
+  - WITH_MOD_FLUID                      OFF
+  - WITH_MOD_OCEANSIM                   OFF
+  - WITH_MOD_REMESH                     OFF
+
+  Rendering:
+  - WITH_HYDRA                          OFF
+
+  Tests:
+  - WITH_GTESTS                         OFF
+  - CYCLES_TEST_DEVICES                 CPU
+  - WITH_CYCLES_TEST_OSL                OFF
+  - WITH_GPU_RENDER_TESTS               OFF
+  - WITH_GPU_BACKEND_TESTS              OFF
+  - WITH_GPU_DRAW_TESTS                 OFF
+  - WITH_GPU_COMPOSITOR_TESTS           OFF
+  - WITH_GPU_MESH_PAINT_TESTS           OFF
+  - WITH_UI_TESTS                       OFF
+  - WITH_UI_TESTS_HEADLESS              OFF
+  - WITH_UI_TESTS_VULKAN                ON
+  - WITH_GPU_RENDER_TESTS_VULKAN        OFF
+  - WITH_LINUX_OFFICIAL_RELEASE_TESTS   OFF
+
+  
+-- Configuring done (1416.6s)
+-- Generating done (3.0s)
+-- Build files have been written to: /nas/Temp/repos/blender-wasm-fork/build-cycles
+export PATH="/nas/Temp/repos/blender-wasm-fork/emsdk/upstream/emscripten:$PATH"; ninja -C /nas/Temp/repos/blender-wasm-fork/build-cycles cycles
+ninja: Entering directory `/nas/Temp/repos/blender-wasm-fork/build-cycles'
+[1/171] Building C object intern/libc_compat/CMakeFiles/bf_intern_libc_compat.dir/libc_compat.c.o
+[2/171] Linking C static library lib/libbf_intern_libc_compat.a
+[3/171] Building CXX object intern/sky/CMakeFiles/bf_intern_sky.dir/source/sky_hosek.cpp.o
+[4/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/embree.cpp.o
+[5/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/hiprt.cpp.o
+[6/171] Building CXX object intern/guardedalloc/CMakeFiles/bf_intern_guardedalloc.dir/intern/mallocn.cc.o
+[7/171] Building CXX object intern/guardedalloc/CMakeFiles/bf_intern_guardedalloc.dir/intern/mallocn_lockfree_impl.cc.o
+[8/171] Building CXX object intern/guardedalloc/CMakeFiles/bf_intern_guardedalloc.dir/intern/mallocn_guarded_impl.cc.o
+[9/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/optix.cpp.o
+[10/171] Building CXX object intern/guardedalloc/CMakeFiles/bf_intern_guardedalloc.dir/intern/leak_detector.cc.o
+[11/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/binning.cpp.o
+[12/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/multi.cpp.o
+[13/171] Building CXX object intern/guardedalloc/CMakeFiles/bf_intern_guardedalloc.dir/intern/memory_usage.cc.o
+[14/171] Linking CXX static library lib/libbf_intern_guardedalloc.a
+[15/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/graphics_interop.cpp.o
+[16/171] Building CXX object intern/sky/CMakeFiles/bf_intern_sky.dir/source/sky_single_scattering.cpp.o
+[17/171] Building CXX object intern/sky/CMakeFiles/bf_intern_sky.dir/source/sky_multiple_scattering.cpp.o
+[18/171] Linking CXX static library lib/libbf_intern_sky.a
+[19/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/bvh.cpp.o
+[20/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/kernel.cpp.o
+[21/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/node.cpp.o
+[22/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/sort.cpp.o
+[23/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/denoise.cpp.o
+[24/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cuda/device_impl.cpp.o
+[25/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cuda/graphics_interop.cpp.o
+[26/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/queue.cpp.o
+[27/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/memory.cpp.o
+[28/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cuda/kernel.cpp.o
+[29/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cuda/queue.cpp.o
+[30/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cuda/util.cpp.o
+[31/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hip/graphics_interop.cpp.o
+[32/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hip/device_impl.cpp.o
+[33/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/device.cpp.o
+/nas/Temp/repos/blender-wasm-fork/blender/intern/cycles/device/device.cpp:638:48: warning: implicit conversion from 'long long' to 'const size_t' (aka 'const unsigned long') changes value from 4294967296 to 0 [-Wconstant-conversion]
+  638 |   const size_t default_limit = 4 * 1024 * 1024 * 1024LL;
+      |                ~~~~~~~~~~~~~   ~~~~~~~~~~~~~~~~^~~~~~~~
+1 warning generated.
+[34/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hip/kernel.cpp.o
+[35/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hip/queue.cpp.o
+[36/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hip/util.cpp.o
+[37/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hiprt/device_impl.cpp.o
+[38/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hiprt/queue.cpp.o
+[39/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/unaligned.cpp.o
+[40/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cpu/kernel.cpp.o
+[41/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/optix/device_impl.cpp.o
+[42/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/optix/queue.cpp.o
+[43/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/split.cpp.o
+[44/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/bvh2.cpp.o
+[45/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cpu/device.cpp.o
+[46/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/adaptive_sampling.cpp.o
+[47/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/octree.cpp.o
+[48/171] Building CXX object intern/cycles/bvh/CMakeFiles/cycles_bvh.dir/build.cpp.o
+[49/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cuda/device.cpp.o
+[50/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/denoiser_oidn_base.cpp.o
+[51/171] Linking CXX static library lib/libcycles_bvh.a
+[52/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/denoiser_optix.cpp.o
+[53/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/denoiser_oidn_gpu.cpp.o
+[54/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/cpu/device_impl.cpp.o
+[55/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/hip/device.cpp.o
+[56/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/dummy/device.cpp.o
+[57/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/optix/device.cpp.o
+[58/171] Building CXX object intern/cycles/graph/CMakeFiles/cycles_graph.dir/node.cpp.o
+[59/171] Building CXX object intern/cycles/graph/CMakeFiles/cycles_graph.dir/node_type.cpp.o
+[60/171] Building CXX object intern/cycles/device/CMakeFiles/cycles_device.dir/multi/device.cpp.o
+[61/171] Building CXX object intern/cycles/graph/CMakeFiles/cycles_graph.dir/node_xml.cpp.o
+[62/171] Linking CXX static library lib/libcycles_device.a
+[63/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/denoiser.cpp.o
+[64/171] Linking CXX static library lib/libcycles_graph.a
+[65/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/tile.cpp.o
+[66/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/denoiser_gpu.cpp.o
+[67/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/denoiser_oidn.cpp.o
+[68/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/pass_accessor.cpp.o
+[69/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/work_balancer.cpp.o
+[70/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/pass_accessor_gpu.cpp.o
+[71/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/path_trace_display.cpp.o
+[72/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/pass_accessor_cpu.cpp.o
+[73/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/path_trace_tile.cpp.o
+[74/171] Building CXX object intern/cycles/kernel/device/cpu/CMakeFiles/cycles_kernel_cpu.dir/globals.cpp.o
+[75/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/path_trace_work.cpp.o
+[76/171] Building CXX object intern/cycles/kernel/device/cpu/CMakeFiles/cycles_kernel_cpu.dir/kernel_avx2.cpp.o
+[77/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/work_tile_scheduler.cpp.o
+[78/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/path_trace.cpp.o
+[79/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/shader_eval.cpp.o
+[80/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/render_scheduler.cpp.o
+[81/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/path_trace_work_cpu.cpp.o
+[82/171] Building CXX object intern/cycles/integrator/CMakeFiles/cycles_integrator.dir/path_trace_work_gpu.cpp.o
+[83/171] Linking CXX static library lib/libcycles_integrator.a
+[84/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/attribute.cpp.o
+[85/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/bake.cpp.o
+[86/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/devicescene.cpp.o
+[87/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/background.cpp.o
+[88/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/constant_fold.cpp.o
+[89/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/film.cpp.o
+[90/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/geometry_attributes.cpp.o
+[91/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/camera.cpp.o
+[92/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/geometry_mesh.cpp.o
+[93/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/geometry_bvh.cpp.o
+[94/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/geometry.cpp.o
+[95/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/hair.cpp.o
+[96/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/image_loader.cpp.o
+[97/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/image_sky.cpp.o
+[98/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/image_oiio.cpp.o
+[99/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/image.cpp.o
+[100/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/image_cache.cpp.o
+[101/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/image_vdb.cpp.o
+[102/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/scene_attributes.cpp.o
+[103/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/integrator.cpp.o
+[104/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/light_tree_debug.cpp.o
+[105/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/mesh_subdivision.cpp.o
+[106/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/mesh_displace.cpp.o
+[107/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/procedural.cpp.o
+[108/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/light_tree.cpp.o
+[109/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/curves.cpp.o
+[110/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/pointcloud.cpp.o
+[111/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/mesh.cpp.o
+[112/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/light.cpp.o
+[113/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/tabulated_sobol.cpp.o
+[114/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/osl.cpp.o
+[115/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/particles.cpp.o
+[116/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/pass.cpp.o
+[117/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/object.cpp.o
+[118/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/display_driver.cpp.o
+[119/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/cache_eviction.cpp.o
+[120/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/tables.cpp.o
+[121/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/buffers.cpp.o
+[122/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/shader.cpp.o
+[123/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/stats.cpp.o
+[124/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/shader_graph.cpp.o
+[125/171] Building CXX object intern/cycles/subd/CMakeFiles/cycles_subd.dir/osd.cpp.o
+[126/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/scene.cpp.o
+[127/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/volume.cpp.o
+[128/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/aligned_malloc.cpp.o
+[129/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/svm.cpp.o
+[130/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/guarded_allocator.cpp.o
+[131/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/denoising.cpp.o
+[132/171] Building CXX object intern/cycles/subd/CMakeFiles/cycles_subd.dir/patch.cpp.o
+[133/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/merge.cpp.o
+[134/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/implicit_sharing.cpp.o
+[135/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/session.cpp.o
+[136/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/debug.cpp.o
+[137/171] Building CXX object intern/cycles/session/CMakeFiles/cycles_session.dir/tile.cpp.o
+[138/171] Building CXX object intern/cycles/subd/CMakeFiles/cycles_subd.dir/dice.cpp.o
+[139/171] Linking CXX static library lib/libcycles_session.a
+[140/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/ies.cpp.o
+[141/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/nanovdb.cpp.o
+[142/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/murmurhash.cpp.o
+[143/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/openvdb.cpp.o
+[144/171] Building CXX object intern/cycles/scene/CMakeFiles/cycles_scene.dir/shader_nodes.cpp.o
+[145/171] Building CXX object intern/cycles/subd/CMakeFiles/cycles_subd.dir/interpolation.cpp.o
+[146/171] Linking CXX static library lib/libcycles_scene.a
+[147/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/math_cdf.cpp.o
+[148/171] Building CXX object intern/cycles/subd/CMakeFiles/cycles_subd.dir/split.cpp.o
+[149/171] Linking CXX static library lib/libcycles_subd.a
+[150/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/colorspace.cpp.o
+[151/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/log.cpp.o
+[152/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/image_metadata.cpp.o
+[153/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/windows.cpp.o
+[154/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/transform.cpp.o
+[155/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/profiling.cpp.o
+[156/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/thread.cpp.o
+[157/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/md5.cpp.o
+[158/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/transform_avx2.cpp.o
+[159/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/string.cpp.o
+[160/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/system.cpp.o
+[161/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/image_maketx.cpp.o
+[162/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/time.cpp.o
+[163/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/task.cpp.o
+[164/171] Building CXX object intern/cycles/util/CMakeFiles/cycles_util.dir/path.cpp.o
+[165/171] Linking CXX static library lib/libcycles_util.a
+[166/171] Building CXX object intern/cycles/app/CMakeFiles/cycles.dir/oiio_output_driver.cpp.o
+[167/171] Building CXX object intern/cycles/app/CMakeFiles/cycles.dir/cycles_standalone.cpp.o
+[168/171] Building CXX object intern/cycles/app/CMakeFiles/cycles.dir/cycles_xml.cpp.o
+[169/171] Building CXX object intern/cycles/kernel/device/cpu/CMakeFiles/cycles_kernel_cpu.dir/kernel.cpp.o
+[170/171] Linking CXX static library lib/libcycles_kernel_cpu.a
+[171/171] Linking CXX executable bin/cycles.js
+bash scripts/link_cycles_web.sh
+>> relinking cycles → /nas/Temp/repos/blender-wasm-fork/web/cycles.js (web-ready)
+em++: warning: -pthread + ALLOW_MEMORY_GROWTH may run non-wasm code slowly, see https://github.com/WebAssembly/design/issues/1271 [-Wpthreads-mem-growth]
+file_packager: error: $/nas/Temp/repos/blender-wasm-fork/web/scenes@/scenes does not exist
+em++: error: '/nas/Temp/repos/blender-wasm-fork/emsdk/upstream/emscripten/tools/file_packager /nas/Temp/repos/blender-wasm-fork/web/cycles.data --from-emcc --preload /nas/Temp/repos/blender-wasm-fork/web/scenes@/scenes --no-node' failed (returned 1)
+make: *** [Makefile:149: cycles-web] Error 1

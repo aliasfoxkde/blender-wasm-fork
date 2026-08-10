@@ -48,6 +48,7 @@ jobs:
           MAKEFLAGS: "-j$(nproc)"
 
       - name: Upload to R2
+        if: secrets.R2_BUCKET != ''
         run: node scripts/sync-assets.mjs
         env:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}

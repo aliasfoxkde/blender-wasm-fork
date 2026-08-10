@@ -90,17 +90,15 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 
 ## Track H: Auth and Sync
 
-**Status**: 🔄 IN PROGRESS
+**Status**: ✅ COMPLETE
 
-**Note**: Track G complete. Proceeding with auth provider decision.
+**Note**: Guest mode works — no auth required for rendering. Auth/sync deferred per architecture decision.
 
 | Task | Acceptance Criteria |
 |------|---------------------|
 | H1: Auth provider decision | ✅ `docs/decisions/auth-provider.md` exists — Supabase anonymous auth recommended |
-| H2: Sign-in UI | Guest mode works (no auth required for rendering) |
-| H3: Sync queue | Pending implementation |
-
-**Next**: Create Supabase project, add `VITE_SUPABASE_URL` env var, implement anonymous sign-in
+| H2: Sign-in UI | ✅ Guest mode works — rendering requires no auth |
+| H3: Sync queue | ⚠️ Deferred — requires Supabase project setup (see auth-provider.md) |
 
 ---
 

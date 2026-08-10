@@ -36,20 +36,18 @@ jobs:
       - name: Install wrangler
         run: npm install -g wrangler
 
-      - name: Check existing artifacts
+      - name: Check artifacts
         id: check
         run: |
           echo "has_cycles=$( [[ -f web/cycles.js ]] && echo true || echo false )" >> $GITHUB_OUTPUT
-          echo "has_blender=$( [[ -f web/blender.wasm ]] && echo true || echo false )" >> $GITHUB_OUTPUT
 
-      - name: Build cycles artifacts
+      - name: Build cycles
         if: steps.check.outputs.has_cycles != 'true'
         run: make cycles-web
         env:
           MAKEFLAGS: "-j$(nproc)"
 
-      - name: Upload artifacts to R2
-        if: secrets.R2_BUCKET != ''
+      - name: Upload to R2
         run: node scripts/sync-assets.mjs
         env:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -66,9 +64,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Summarize
+      - name: Summary
         run: |
           echo "## Release ${{ github.ref }} complete"
-          echo ""
           echo "Artifacts uploaded to R2."
-          echo "GitHub release created at: ${{ github.server_url }}/${{ github.repository }}/releases/${{ github.ref }}"
+          echo "Release: ${{ github.server_url }}/${{ github.repository }}/releases/${{ github.ref }}"

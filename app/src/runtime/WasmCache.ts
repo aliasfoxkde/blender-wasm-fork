@@ -15,7 +15,6 @@
 const DB_NAME = "blender-wasm-cache";
 const DB_VERSION = 1;
 const STORE_NAME = "wasm-binaries";
-const MAX_ENTRIES = 5;
 
 interface CacheEntry {
   url: string;
@@ -35,40 +34,6 @@ function openDB(): Promise<IDBDatabase> {
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
-  });
-}
-
-async function evictIfNeeded(db: IDBDatabase): Promise<void> {
-  const tx = db.transaction(STORE_NAME, "readwrite");
-  const store = tx.objectStore(STORE_NAME);
-  const countReq = store.count();
-
-  return new Promise((resolve, reject) => {
-    countReq.onsuccess = () => {
-      const count = countReq.result;
-      if (count < MAX_ENTRIES) {
-        tx.addEventListener("complete", () => resolve());
-        tx.addEventListener("error", () => reject(tx.error));
-        return;
-      }
-
-      // Get all entries sorted by timestamp (oldest first)
-      const getAllReq = store.getAll();
-      getAllReq.onsuccess = () => {
-        const entries: CacheEntry[] = getAllReq.result;
-        entries.sort((a, b) => a.timestamp - b.timestamp);
-
-        // Delete oldest entries to make room
-        const toDelete = entries.slice(0, count - MAX_ENTRIES + 1);
-        for (const entry of toDelete) {
-          store.delete(entry.url);
-        }
-        tx.addEventListener("complete", () => resolve());
-        tx.addEventListener("error", () => reject(tx.error));
-      };
-      getAllReq.onerror = () => reject(getAllReq.error);
-    };
-    countReq.onerror = () => reject(countReq.error);
   });
 }
 

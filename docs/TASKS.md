@@ -139,12 +139,12 @@ Cache decompressed Cycles WASM in IndexedDB for sub-second warm starts.
 - Cloudflare Pages deployment deferred — Worker serves app from R2 instead
 
 ### Phase 14: App Sync-on-Load
-**PARTIAL — manifest version check wired, UI not yet integrated into app shell**
+**COMPLETE — wired into RenderProofPage app shell**
 
-- `CyclesRenderRuntime.checkR2Version()` fetches R2 manifest and returns version
-- `StorageStatus` component shows WASM cache count and clear button
-- `RenderHistoryList` component shows saved renders with delete
-- App shell needs to wire these into the main UI
+- `CyclesRenderRuntime.checkR2Version()` fetches R2 manifest and displays version during load
+- `StorageStatus` component in RenderProofPage shows WASM cache count, storage quota, clear button
+- `RenderHistoryList` component in RenderProofPage shows saved renders with delete buttons
+- App deployed at both Cloudflare Pages and Worker+R2
 
 ### Phase 15: Persistence (Track G)
 Implement local IndexedDB schema, render history, and storage cleanup UI.

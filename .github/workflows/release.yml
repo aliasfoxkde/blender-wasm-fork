@@ -67,22 +67,9 @@ jobs:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
           R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
 
-      - name: Upload artifacts to GitHub Release
-        run: |
-          ASSETS=""
-          for f in web/cycles.js web/cycles.wasm web/cycles.wasm.zst web/cycles.data; do
-            if [[ -f $f ]]; then
-              ASSETS="$ASSETS $f"
-            fi
-          done
-          if [[ -n "$ASSETS" ]]; then
-            gh release upload ${{ github.ref }} $ASSETS --repo ${{ github.repository }}
-          fi
-
       - name: Generate release notes
         id: release-notes
         run: |
-          TAG=${GITHUB_REF#refs:tags/}
           NOTES="## Artifacts
 
 Blender WASM artifacts are hosted on Cloudflare R2.
@@ -106,13 +93,10 @@ App syncs artifacts on first load — no git LFS required.
 
 Artifacts served from: https://blender-wasm-assets.cyopsys.workers.dev
 
-To deploy your own R2 bucket:
+To deploy your own R2 bucket, add these secrets to your repo and run:
 
 \`\`\`bash
-export R2_BUCKET=your-bucket
-export R2_ACCOUNT_ID=your_account_id
-export R2_ACCESS_KEY=your_key
-export R2_SECRET_KEY=your_secret
+export R2_BUCKET=your-bucket R2_ACCOUNT_ID=... R2_ACCESS_KEY=... R2_SECRET_KEY=...
 node scripts/sync-assets.mjs
 \`\`\`
 "
@@ -126,7 +110,7 @@ node scripts/sync-assets.mjs
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
           generate_release_notes: false
-          body_path: release-notes.md
+          body: ${{ steps.release-notes.outputs.notes }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

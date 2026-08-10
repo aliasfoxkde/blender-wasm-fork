@@ -127,8 +127,11 @@ Enable `WITH_GPU=ON` and WebGPU backend for GPU-accelerated rendering in browser
 ### Phase 12: Persistent WASM Cache
 Cache decompressed Cycles WASM in IndexedDB for sub-second warm starts.
 
-### Phase 13: Production Artifact Delivery
-Zstd streaming IS wired — `CyclesRenderRuntime.locateFile` returns `.wasm.zst` paths and `demo/vite.config.js` middleware decompresses on-the-fly. Remaining work: CDN deployment for `blender.wasm` (143 MB) and `blender.data` (58 MB) which exceed GitHub file limits.
+### Phase 13: Cloudflare R2 Artifact Hosting
+Cloudflare R2 + Worker IS wired — `infra/worker.ts` serves WASM files from R2 with COOP/COEP headers. `scripts/sync-assets.mjs` uploads to R2. `.github/workflows/release.yml` creates GitHub releases on tag push. Latest release only (10 GB R2 free tier).
 
-### Phase 14: Persistence (Track G)
+### Phase 14: App Sync-on-Load
+Update `CyclesRenderRuntime` to check R2 manifest on load, download/update artifacts if newer version detected. Add sync status UI. (Not yet implemented)
+
+### Phase 15: Persistence (Track G)
 Implement local IndexedDB schema, render history, and storage cleanup UI.

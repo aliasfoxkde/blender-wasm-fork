@@ -1,0 +1,12 @@
+name = "blender-wasm-assets"
+main = "src/worker.ts"
+compatibility_date = "2024-01-01"
+
+# R2 bucket binding — matches WORKER_ENV.BUCKET name below
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "blender-wasm-assets"
+
+[vars]
+# Base URL where this worker is deployed (e.g. https://blender-wasm-assets.yourname.workers.dev)
+ASSET_BASE_URL = "https://blender-wasm-assets.yourname.workers.dev"

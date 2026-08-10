@@ -1,0 +1,120 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"  # e.g. v1.0.0, v2.1.0
+
+# Only one release can run at a time
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build & Upload Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install wrangler
+        run: npm install -g wrangler
+
+      - name: Build cycles artifacts
+        run: make cycles-web
+        env:
+          MAKEFLAGS: "-j$(nproc)"
+
+      # Note: Full blender build requires builder machine (44GB disk, 31GB RAM)
+      # Only run blender-web on tags from the builder machine, or skip if artifacts missing
+      - name: Build blender artifacts (builder-only)
+        run: |
+          if [[ -f web/blender.wasm ]] && [[ -f web/blender.data ]]; then
+            echo "Blender artifacts present — using existing files"
+          else
+            echo "Blender artifacts not found — this release only contains Cycles artifacts"
+          fi
+
+      - name: Upload artifacts to R2
+        run: node scripts/sync-assets.mjs
+        env:
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          NOTES="## Artifacts
+
+Blender WASM artifacts are hosted on Cloudflare R2.
+App syncs artifacts on first load — no git LFS required.
+
+### Included in this release
+
+| File | Size |
+|------|------|
+"
+
+          for f in web/cycles.js web/cycles.wasm web/cycles.wasm.zst web/cycles.data demo/public/manifest.json; do
+            if [[ -f $f ]]; then
+              SIZE=$(du -h "$f" | cut -f1)
+              NOTES+="| $f | $SIZE |"$'\n'
+            fi
+          done
+
+          NOTES+="
+### Cloudflare R2
+
+Artifacts served from: https://blender-wasm-assets.yourname.workers.dev
+
+To update the app URL, set \`ARTIFACT_BASE\` in the app runtime.
+
+\`\`\`bash
+# Sync to your own R2 bucket
+export R2_BUCKET=your-bucket
+export R2_ACCOUNT_ID=your_account_id
+export R2_ACCESS_KEY=your_key
+export R2_SECRET_KEY=your_secret
+node scripts/sync-assets.mjs
+\`\`\`
+"
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+          generate_release_notes: false
+          body_path: release-notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summarize
+        run: |
+          echo "## Release ${{ github.ref }} complete"
+          echo ""
+          echo "Artifacts uploaded to R2."
+          echo "GitHub release created at: ${{ github.server_url }}/${{ github.repository }}/releases/${{ github.ref }}"

@@ -47,10 +47,15 @@ This directory contains build, test, and utility scripts for the Blender WASM pr
 ### Serve & Verify Scripts
 | Script | Purpose |
 |--------|---------|
-| `serve.mjs` | Serves the web directory on a port (used by `make serve`) |
+| `serve.mjs` | Serves the web directory on a port with COOP/COEP headers (used by `make serve`) |
 | `verify.mjs` | Playwright verification of rendered output (used by `make verify`, `make verify-render`) |
 | `verify_blender_webgpu.mjs` | Verifies Blender WebGPU pipeline (used by `make verify-blender-webgpu`) |
 | `verify_webgpu.mjs` | Verifies WebGPU compute pipeline (used by `make verify-webgpu`) |
+
+### Cloudflare R2 Scripts
+| Script | Purpose |
+|--------|---------|
+| `sync-assets.mjs` | Uploads WASM artifacts to Cloudflare R2 via `wrangler r2 object put` |
 
 ### Audit Scripts
 | Script | Purpose |

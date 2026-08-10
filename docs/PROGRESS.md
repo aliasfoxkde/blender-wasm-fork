@@ -97,14 +97,12 @@
 
 1. **`cycles.data` is placeholder (12 B)**: No real `.blend` scene data embedded
 2. **No WebGPU/EEVEE rendering**: GPU backend not enabled
-3. **E2E smoke tests not in CI**: `deployed-smoke.spec.ts` requires `BASE_URL` env var
-4. **R2 GitHub secrets unconfigured**: `release.yml` can't upload to R2 automatically
-5. **Custom domain DNS unconfigured**: `blender-wasm.cyopsys.com` not pointed to Pages
-6. **build-release.yml cancelled**: Requires builder machine (44 GB disk, 31 GB RAM, 16 cores)
-7. **Track H sync queue deferred**: Pending Supabase project setup
-8. **No PWA manifest/service worker**: Not installable
-9. **No error boundary**: App doesn't recover from runtime crashes
-10. **No actual render pipeline**: `renderSampleScene()` skeleton returns error, not real output
+3. **R2 GitHub secrets unconfigured**: `release.yml` can't upload to R2 automatically
+4. **Custom domain DNS unconfigured**: `blender-wasm.cyopsys.com` not pointed to Pages
+5. **build-release.yml cancelled**: Requires builder machine (44 GB disk, 31 GB RAM, 16 cores)
+6. **Track H sync queue deferred**: Pending Supabase project setup
+7. **No service worker (PWA offline)**: manifest added but no SW for offline caching
+8. **`renderSampleScene()` needs real scene data**: Uses `/scenes/scene.blend` — scene.blend exists (121KB) but artifact loading path needs validation
 
 ---
 
@@ -113,15 +111,16 @@
 | # | Task | Priority | Status | Notes |
 |---|------|----------|--------|-------|
 | 1 | Embed real `.blend` in `cycles.data` | P0 | TODO | No real render output without this |
-| 2 | Wire `renderSampleScene()` to Cycles | P0 | TODO | Skeleton exists but returns error |
+| 2 | Wire `renderSampleScene()` to Cycles | P0 | TODO | Skeleton exists, needs real artifact loading |
 | 3 | Add E2E smoke test to CI | P1 | ✅ DONE | 10 tests now in CI, all passing |
 | 4 | Configure R2 GitHub secrets | P1 | TODO | Manual — `docs/R2-SECRETS-SETUP.md` |
 | 5 | Set up self-hosted runner for build | P1 | TODO | Manual — `docs/BUILDER-SETUP.md` |
 | 6 | Configure custom domain DNS | P2 | TODO | Manual — Cloudflare dashboard |
-| 7 | Add PWA manifest + service worker | P2 | ✅ DONE | manifest.json + favicon.svg added |
+| 7 | Add PWA manifest | P2 | ✅ DONE | manifest.json + favicon.svg added |
 | 8 | Implement Supabase anonymous auth | P2 | TODO | After Supabase project creation |
-| 9 | Add error boundary + crash recovery | P2 | ✅ DONE | ErrorBoundary already in main.tsx |
-| 10 | Enable WebGPU backend | P3 | TODO | Requires `WITH_GPU=ON` in build |
+| 9 | Add error boundary + crash recovery | P2 | ✅ DONE | ErrorBoundary in main.tsx |
+| 10 | Add service worker for offline PWA | P2 | TODO | Missing SW for full PWA installability |
+| 11 | Enable WebGPU backend | P3 | TODO | Requires `WITH_GPU=ON` in build |
 
 ---
 

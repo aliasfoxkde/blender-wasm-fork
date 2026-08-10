@@ -164,7 +164,7 @@ export class CyclesRenderRuntime {
   }
 
   private async _instantiateWasm(): Promise<void> {
-    this._state.transition("loading");
+    // State is already "loading" (set by load()). Don't re-transition — loading->loading is invalid.
     this.emitState(this._state.state);
     this.emit({ phase: "instantiate", message: "Loading Cycles WASM module..." });
 

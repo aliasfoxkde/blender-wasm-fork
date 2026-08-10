@@ -393,4 +393,82 @@ describe("CyclesRenderRuntime", () => {
     const loadingIndex = states.indexOf("loading");
     expect(loadingIndex).toBeLessThan(errorIndex);
   });
+
+  // ===== WASM Load Success Tests (requires bug fix) =====
+  // These tests verify the _instantiateWasm loading -> ready state transition works.
+  // They require: (1) valid manifest, (2) window.Module set before loadScript resolves.
+  describe("WASM load success (with valid manifest)", () => {
+    const validManifest = {
+      schema: 1,
+      name: "cycles-render",
+      version: "1.0.0",
+      createdAt: "2024-01-01T00:00:00.000Z",
+      source: { remote: "https://example.com", ref: "main" },
+      toolchain: { emscripten: "3.1.0" },
+      capabilities: ["headless-render"],
+      requirements: {},
+      artifacts: {
+        "cycles.js": { path: "cycles.js", mediaType: "application/javascript", bytes: 199_300 },
+        "cycles.wasm": { path: "cycles.wasm.zst", mediaType: "application/wasm", bytes: 3_400_000 },
+        "cycles.data": { path: "cycles.data", mediaType: "application/octet-stream", bytes: 12 },
+      },
+    };
+
+    beforeEach(() => {
+      // Valid manifest fetch
+      globalThis.fetch = async () =>
+        new Response(JSON.stringify(validManifest), { status: 200 }) as any;
+
+      // Mock appendChild: set window.Module before firing onload.
+      // This simulates what the real cycles.js does when it executes:
+      // it sets window.Module synchronously before onload fires.
+      vi.spyOn(document.head, "appendChild").mockImplementation((el: any) => {
+        if (el?.tagName === "SCRIPT") {
+          (window as any).Module = {
+            callMain: () => {},
+            FS: { mkdir: () => {}, chdir: () => {}, readFile: () => new Uint8Array([0x89, 0x50, 0x4e, 0x47]) },
+          };
+          if (typeof el.onload === "function") {
+            el.onload({ type: "load" } as any);
+          }
+        }
+        return el;
+      });
+    });
+
+    it("load reaches ready state with valid manifest and mocked WASM", async () => {
+      await runtime.load();
+      expect(runtime.state).toBe("ready");
+      expect(runtime.isLoaded).toBe(true);
+      expect(runtime.isWasmReady).toBe(true);
+    });
+
+    it("getManifest returns manifest after successful load", async () => {
+      await runtime.load();
+      const manifest = runtime.getManifest();
+      expect(manifest).not.toBeNull();
+      expect(manifest?.name).toBe("cycles-render");
+    });
+
+    it("state transitions: unavailable -> loading -> ready on full load", async () => {
+      const states: string[] = [];
+      runtime.onStateChange((s) => states.push(s));
+
+      await runtime.load();
+
+      expect(states).toContain("loading");
+      expect(states).toContain("ready");
+      expect(runtime.state).toBe("ready");
+    });
+
+    it("progress events include instantiate phase during load", async () => {
+      const phases: string[] = [];
+      runtime.onProgress((p) => phases.push(p.phase));
+
+      await runtime.load();
+
+      expect(phases).toContain("fetch");
+      expect(phases).toContain("instantiate");
+    });
+  });
 });

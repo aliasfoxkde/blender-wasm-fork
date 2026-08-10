@@ -112,7 +112,7 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 - **Heavy build requires builder machine**: 44 GB disk, 31 GB RAM, 16 cores, ~2 hr build time
 - **No WebGPU/EEVEE rendering**: GPU backend not yet enabled
 - **Zstd streaming wired**: `CyclesRenderRuntime.locateFile` prefers `.wasm.zst`, demo server decompresses on-the-fly
-- **IndexedDB warm start not implemented**: WASM module not cached persistently for faster reload
+- **IndexedDB warm start wired**: `CyclesRenderRuntime` checks IndexedDB cache via `Module["wasmBinary"]` for fast warm starts. Cache size and clear methods exposed.
 
 ---
 
@@ -128,10 +128,18 @@ Enable `WITH_GPU=ON` and WebGPU backend for GPU-accelerated rendering in browser
 Cache decompressed Cycles WASM in IndexedDB for sub-second warm starts.
 
 ### Phase 13: Cloudflare R2 Artifact Hosting
-Cloudflare R2 + Worker IS wired — `infra/worker.ts` serves WASM files from R2 with COOP/COEP headers. `scripts/sync-assets.mjs` uploads to R2. `.github/workflows/release.yml` creates GitHub releases on tag push. Latest release only (10 GB R2 free tier).
+**COMPLETE — verified at `https://blender-wasm-assets.cyopsys.workers.dev`**
+
+- R2 bucket `blender-wasm-assets` created and populated with all artifact types
+- `infra/worker.ts` routes: `/cycles.*`, `/blender.*`, `/render.html`, `/smoke.html` — all returning 200 with correct COOP/COEP headers
+- `scripts/sync-assets.mjs` uploads via `wrangler r2 object put --remote`
+- `ARTIFACT_BASE` env var in CyclesRenderRuntime lets app use R2 URL at build time
+- `.env` / `.env.example` for local dev vs production configuration
+- Latest release only (10 GB R2 free tier)
+- Cloudflare Pages deployment and full app sync-on-load deferred to Phase 14
 
 ### Phase 14: App Sync-on-Load
-Update `CyclesRenderRuntime` to check R2 manifest on load, download/update artifacts if newer version detected. Add sync status UI. (Not yet implemented)
+Make app check R2 manifest on load, download/update artifacts if newer version detected. Add sync status UI. Requires Cloudflare Pages deployment of the full app.
 
 ### Phase 15: Persistence (Track G)
 Implement local IndexedDB schema, render history, and storage cleanup UI.

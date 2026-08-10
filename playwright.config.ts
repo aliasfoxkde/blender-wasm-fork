@@ -15,6 +15,7 @@ export default defineConfig({
    * must be run explicitly with --grep "@deployed" or by setting BASE_URL. */
   grepInvert: /@deployed/,
   use: {
+    baseURL: process.env.BASE_URL || "http://localhost:4173",
     trace: "on-first-retry",
   },
   projects: [
@@ -24,8 +25,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "node scripts/serve.mjs web 4173",
-    url: "http://localhost:4173/smoke.html",
+    command: "node scripts/serve.mjs app/dist 4173",
+    url: "http://localhost:4173/",
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
     cwd: process.cwd(),

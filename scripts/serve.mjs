@@ -55,6 +55,9 @@ const server = createServer(async (req, res) => {
     if (!p.startsWith(ROOT)) { res.writeHead(403).end(); return; }
     let s = await stat(p).catch(() => null);
     if (s && s.isDirectory()) { p = join(p, "index.html"); s = await stat(p).catch(() => null); }
+    // SPA fallback: if no file found and path has no extension, serve index.html
+    // This allows React Router to handle client-side routing
+    if (!s && !extname(urlPath)) { p = normalize(join(ROOT, "index.html")); s = await stat(p).catch(() => null); }
     if (!s) { res.writeHead(404).end("not found: " + url.pathname); return; }
     const body = await readFile(p);
     res.writeHead(200, {

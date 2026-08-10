@@ -14,6 +14,9 @@ vi.mock("../runtime/CyclesRenderRuntime", () => ({
     load: vi.fn().mockResolvedValue(undefined),
     renderSampleScene: vi.fn().mockResolvedValue({ success: false, id: "test", error: "no artifacts" }),
     dispose: vi.fn(),
+    checkR2Version: vi.fn().mockResolvedValue({ version: null, error: null }),
+    getCacheSize: vi.fn().mockResolvedValue(0),
+    clearCache: vi.fn().mockResolvedValue(undefined),
   })),
 }));
 

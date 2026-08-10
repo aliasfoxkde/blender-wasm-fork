@@ -24,9 +24,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "node scripts/serve-with-headers.mjs 4173 web",
-    url: "http://localhost:4173",
+    command: "node scripts/serve.mjs web 4173",
+    url: "http://localhost:4173/smoke.html",
     reuseExistingServer: !process.env.CI,
     timeout: 30000,
+    cwd: process.cwd(),
   },
 });

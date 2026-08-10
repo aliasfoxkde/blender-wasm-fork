@@ -12,6 +12,8 @@ import { useEffect, useRef, useState } from "react";
 import { CyclesRenderRuntime, type RuntimeProgress as RuntimeProgressType } from "../runtime/CyclesRenderRuntime";
 import { RuntimeProgress } from "../components/RuntimeProgress";
 import { DiagnosticsDrawer } from "../components/DiagnosticsDrawer";
+import { StorageStatus } from "../components/StorageStatus";
+import { RenderHistoryList } from "../components/RenderHistoryList";
 import type { RuntimeState } from "../runtime/runtimeState";
 
 function getBrowserCapabilities() {
@@ -60,6 +62,18 @@ export function RenderProofPage() {
     };
   }, []);
 
+  const [r2Version, setR2Version] = useState<string | null>(null);
+
+  // Check R2 manifest version on mount
+  useEffect(() => {
+    const runtime = runtimeRef.current;
+    if (runtime) {
+      runtime.checkR2Version().then(({ version }) => {
+        if (version) setR2Version(version);
+      }).catch(() => {});
+    }
+  }, []);
+
   const handleRender = async () => {
     const runtime = runtimeRef.current;
     if (!runtime) return;
@@ -95,6 +109,11 @@ export function RenderProofPage() {
             percent={progress?.percent}
             message={progress?.message ?? "Loading..."}
           />
+          {r2Version && (
+            <p className="version-hint" style={{ fontSize: "0.75rem", color: "#666", marginTop: "0.5rem" }}>
+              Artifact version: {r2Version}
+            </p>
+          )}
         </div>
       )}
 
@@ -126,6 +145,8 @@ export function RenderProofPage() {
       )}
 
       <DiagnosticsDrawer capabilities={capabilities} />
+      <StorageStatus runtime={runtimeRef.current} />
+      <RenderHistoryList />
     </main>
   );
 }

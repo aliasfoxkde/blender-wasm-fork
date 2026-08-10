@@ -111,7 +111,7 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 - **`blender.wasm` / `blender.data` not committed**: 143 MB and 58 MB exceed GitHub file size limits
 - **Heavy build requires builder machine**: 44 GB disk, 31 GB RAM, 16 cores, ~2 hr build time
 - **No WebGPU/EEVEE rendering**: GPU backend not yet enabled
-- **No zstd streaming wired**: `serve-zstd.mjs` exists but not integrated into app runtime
+- **Zstd streaming wired**: `CyclesRenderRuntime.locateFile` prefers `.wasm.zst`, demo server decompresses on-the-fly
 - **IndexedDB warm start not implemented**: WASM module not cached persistently for faster reload
 
 ---
@@ -128,7 +128,7 @@ Enable `WITH_GPU=ON` and WebGPU backend for GPU-accelerated rendering in browser
 Cache decompressed Cycles WASM in IndexedDB for sub-second warm starts.
 
 ### Phase 13: Production Artifact Delivery
-Wire `serve-zstd.mjs` streaming into the app runtime. Add CDN deployment for `blender.wasm` / `blender.data`.
+Zstd streaming IS wired — `CyclesRenderRuntime.locateFile` returns `.wasm.zst` paths and `demo/vite.config.js` middleware decompresses on-the-fly. Remaining work: CDN deployment for `blender.wasm` (143 MB) and `blender.data` (58 MB) which exceed GitHub file limits.
 
 ### Phase 14: Persistence (Track G)
 Implement local IndexedDB schema, render history, and storage cleanup UI.

@@ -48,13 +48,17 @@ jobs:
           MAKEFLAGS: "-j$(nproc)"
 
       - name: Upload to R2
-        if: secrets.R2_BUCKET != ''
-        run: node scripts/sync-assets.mjs
         env:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
           R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        run: |
+          if [[ -n "$R2_BUCKET" ]]; then
+            node scripts/sync-assets.mjs
+          else
+            echo "R2_BUCKET not configured — skipping R2 upload"
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

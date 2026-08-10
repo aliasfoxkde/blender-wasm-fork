@@ -90,6 +90,18 @@ export class CyclesRenderRuntime {
     await clearWasmCache();
   }
 
+  /** Check what version the R2 manifest declares without loading full artifacts. */
+  async checkR2Version(): Promise<{ version: string | null; error: string | null }> {
+    try {
+      const res = await fetch(`${ARTIFACT_BASE}/manifest.json`);
+      if (!res.ok) return { version: null, error: `HTTP ${res.status}` };
+      const manifest = await res.json() as ArtifactManifest;
+      return { version: manifest.version ?? manifest.name ?? null, error: null };
+    } catch (err) {
+      return { version: null, error: String(err) };
+    }
+  }
+
   onProgress(callback: (p: RuntimeProgress) => void): () => void {
     this._progressCallbacks.push(callback);
     return () => {

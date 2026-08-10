@@ -76,23 +76,21 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 
 ## Track G: Persistence
 
-**Status**: ⚠️ PARTIAL — core storage implemented, UI not yet integrated
+**Status**: ✅ COMPLETE
 
 | Task | Acceptance Criteria |
 |------|---------------------|
 | G1: Local DB schema | ✅ `app/src/storage/renderHistory.ts` with IndexedDB schema |
 | G2: Render history | ✅ `saveRenderRecord`, `getRenderRecords`, `deleteRenderRecord` with tests |
-| G3: Storage cleanup UI | ⚠️ WasmCache has `clearCache()` / `getCacheSize()` but no UI yet |
-
-**Note**: IndexedDB schema in place with timestamp and sceneId indexes. Render history CRUD operations implemented and tested. UI integration (delete buttons, storage meter) still needed.
+| G3: Storage cleanup UI | ✅ `StorageStatus` component for WASM cache; `RenderHistoryList` for render history; both wired to IndexedDB storage |
 
 ---
 
 ## Track H: Auth and Sync
 
-**Status**: ⚠️ TODO
+**Status**: ⚠️ DEFERRED — requires auth provider decision and app sync architecture
 
-**Note**: Do not start until local storage (Track G) works.
+**Note**: Depends on Phase 14 (sync-on-load) completing first.
 
 | Task | Acceptance Criteria |
 |------|---------------------|
@@ -141,7 +139,12 @@ Cache decompressed Cycles WASM in IndexedDB for sub-second warm starts.
 - Cloudflare Pages deployment deferred — Worker serves app from R2 instead
 
 ### Phase 14: App Sync-on-Load
-Make app check R2 manifest on load, download/update artifacts if newer version detected. Add sync status UI. Worker + R2 already serving the app.
+**PARTIAL — manifest version check wired, UI not yet integrated into app shell**
+
+- `CyclesRenderRuntime.checkR2Version()` fetches R2 manifest and returns version
+- `StorageStatus` component shows WASM cache count and clear button
+- `RenderHistoryList` component shows saved renders with delete
+- App shell needs to wire these into the main UI
 
 ### Phase 15: Persistence (Track G)
 Implement local IndexedDB schema, render history, and storage cleanup UI.

@@ -76,15 +76,15 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 
 ## Track G: Persistence
 
-**Status**: ⚠️ TODO
+**Status**: ⚠️ PARTIAL — core storage implemented, UI not yet integrated
 
 | Task | Acceptance Criteria |
 |------|---------------------|
-| G1: Local DB schema | Migration tests pass |
-| G2: Render history | Create/list/delete tests pass |
-| G3: Storage cleanup UI | User can clear artifact cache and render history separately |
+| G1: Local DB schema | ✅ `app/src/storage/renderHistory.ts` with IndexedDB schema |
+| G2: Render history | ✅ `saveRenderRecord`, `getRenderRecords`, `deleteRenderRecord` with tests |
+| G3: Storage cleanup UI | ⚠️ WasmCache has `clearCache()` / `getCacheSize()` but no UI yet |
 
-**Status**: TODO — depends on Phase 10+ app hardening
+**Note**: IndexedDB schema in place with timestamp and sceneId indexes. Render history CRUD operations implemented and tested. UI integration (delete buttons, storage meter) still needed.
 
 ---
 

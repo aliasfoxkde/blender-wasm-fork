@@ -110,6 +110,7 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 - **Blender headless hang**: E2E tests for `blender.html` timeout in headless Chromium (143 MB WASM load exceeds 30s)
 - **`blender.wasm` / `blender.data` not committed**: 143 MB and 58 MB exceed GitHub file size limits
 - **Heavy build requires builder machine**: 44 GB disk, 31 GB RAM, 16 cores, ~2 hr build time
+- **Cloudflare Pages 522 loop**: Pages can't proxy to Worker on same zone; app served directly from Worker + R2 instead
 - **No WebGPU/EEVEE rendering**: GPU backend not yet enabled
 - **Zstd streaming wired**: `CyclesRenderRuntime.locateFile` prefers `.wasm.zst`, demo server decompresses on-the-fly
 - **IndexedDB warm start wired**: `CyclesRenderRuntime` checks IndexedDB cache via `Module["wasmBinary"]` for fast warm starts. Cache size and clear methods exposed.
@@ -136,10 +137,11 @@ Cache decompressed Cycles WASM in IndexedDB for sub-second warm starts.
 - `ARTIFACT_BASE` env var in CyclesRenderRuntime lets app use R2 URL at build time
 - `.env` / `.env.example` for local dev vs production configuration
 - Latest release only (10 GB R2 free tier)
-- Cloudflare Pages deployment and full app sync-on-load deferred to Phase 14
+- App deployed at `https://blender-wasm-assets.cyopsys.workers.dev/` via Worker + R2 (Pages 522 loop workaround)
+- Cloudflare Pages deployment deferred — Worker serves app from R2 instead
 
 ### Phase 14: App Sync-on-Load
-Make app check R2 manifest on load, download/update artifacts if newer version detected. Add sync status UI. Requires Cloudflare Pages deployment of the full app.
+Make app check R2 manifest on load, download/update artifacts if newer version detected. Add sync status UI. Worker + R2 already serving the app.
 
 ### Phase 15: Persistence (Track G)
 Implement local IndexedDB schema, render history, and storage cleanup UI.

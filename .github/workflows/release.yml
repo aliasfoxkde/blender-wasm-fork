@@ -37,22 +37,29 @@ jobs:
       - name: Install wrangler
         run: npm install -g wrangler
 
+      - name: Check existing artifacts
+        id: check_artifacts
+        run: |
+          echo "has_cycles=$( [[ -f web/cycles.js ]] && echo true || echo false )" >> $GITHUB_OUTPUT
+          echo "has_blender=$( [[ -f web/blender.wasm ]] && echo true || echo false )" >> $GITHUB_OUTPUT
+
+      # Build cycles only if artifacts don't already exist (builder machine has them pre-built)
+      # Standard CI runners don't have the emscripten toolchain — this step is best-effort
       - name: Build cycles artifacts
-        run: make cycles-web
+        if: steps.check_artifacts.outputs.has_cycles != 'true'
+        run: |
+          if [[ -f web/cycles.js ]]; then
+            echo "Cycles artifacts present"
+          elif make cycles-web; then
+            echo "Cycles build succeeded"
+          else
+            echo "Cycles build not available — this workflow needs to run on the builder machine with emscripten toolchain"
+          fi
         env:
           MAKEFLAGS: "-j$(nproc)"
 
-      # Note: Full blender build requires builder machine (44GB disk, 31GB RAM)
-      # Only run blender-web on tags from the builder machine, or skip if artifacts missing
-      - name: Build blender artifacts (builder-only)
-        run: |
-          if [[ -f web/blender.wasm ]] && [[ -f web/blender.data ]]; then
-            echo "Blender artifacts present — using existing files"
-          else
-            echo "Blender artifacts not found — this release only contains Cycles artifacts"
-          fi
-
       - name: Upload artifacts to R2
+        if: secrets.R2_BUCKET != ''
         run: node scripts/sync-assets.mjs
         env:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -60,10 +67,22 @@ jobs:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
           R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
 
+      - name: Upload artifacts to GitHub Release
+        run: |
+          ASSETS=""
+          for f in web/cycles.js web/cycles.wasm web/cycles.wasm.zst web/cycles.data; do
+            if [[ -f $f ]]; then
+              ASSETS="$ASSETS $f"
+            fi
+          done
+          if [[ -n "$ASSETS" ]]; then
+            gh release upload ${{ github.ref }} $ASSETS --repo ${{ github.repository }}
+          fi
+
       - name: Generate release notes
         id: release-notes
         run: |
-          TAG=${GITHUB_REF#refs/tags/}
+          TAG=${GITHUB_REF#refs:tags/}
           NOTES="## Artifacts
 
 Blender WASM artifacts are hosted on Cloudflare R2.
@@ -75,7 +94,7 @@ App syncs artifacts on first load — no git LFS required.
 |------|------|
 "
 
-          for f in web/cycles.js web/cycles.wasm web/cycles.wasm.zst web/cycles.data demo/public/manifest.json; do
+          for f in web/cycles.js web/cycles.wasm web/cycles.wasm.zst web/cycles.data; do
             if [[ -f $f ]]; then
               SIZE=$(du -h "$f" | cut -f1)
               NOTES+="| $f | $SIZE |"$'\n'
@@ -85,12 +104,11 @@ App syncs artifacts on first load — no git LFS required.
           NOTES+="
 ### Cloudflare R2
 
-Artifacts served from: https://blender-wasm-assets.yourname.workers.dev
+Artifacts served from: https://blender-wasm-assets.cyopsys.workers.dev
 
-To update the app URL, set \`ARTIFACT_BASE\` in the app runtime.
+To deploy your own R2 bucket:
 
 \`\`\`bash
-# Sync to your own R2 bucket
 export R2_BUCKET=your-bucket
 export R2_ACCOUNT_ID=your_account_id
 export R2_ACCESS_KEY=your_key

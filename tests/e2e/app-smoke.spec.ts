@@ -62,4 +62,25 @@ test.describe("App smoke", () => {
     await page.getByText("Diagnostics").click();
     await expect(page.getByText("WebGPU")).toBeVisible();
   });
+
+  test("PWA manifest is available", async ({ page }) => {
+    const response = await page.goto("/manifest.json");
+    expect(response?.status()).toBe(200);
+    const manifest = await page.evaluate(() => {
+      try { return JSON.parse(document.body.textContent || ""); } catch { return null; }
+    });
+    expect(manifest?.name).toBe("Blender Web Runtime");
+    expect(manifest?.short_name).toBe("Blender WASM");
+  });
+
+  test("PWA manifest has valid icon reference", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const manifest = await page.evaluate(async () => {
+      const res = await fetch("/manifest.json");
+      return res.json();
+    });
+    expect(manifest.icons).toBeDefined();
+    expect(manifest.icons.length).toBeGreaterThan(0);
+  });
 });

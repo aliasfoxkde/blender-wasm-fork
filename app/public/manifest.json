@@ -1,0 +1,19 @@
+{
+  "name": "Blender Web Runtime",
+  "short_name": "Blender WASM",
+  "description": "Real Blender rendering in the browser powered by WebAssembly and Cycles.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["graphics", "design", "utilities"]
+}

@@ -88,17 +88,17 @@ Tracks A-H from `blueprint/plans/21-agent-task-backlog.md`.
 
 ## Track H: Auth and Sync
 
-**Status**: ⚠️ DEFERRED — requires auth provider decision and app sync architecture
+**Status**: 🔄 IN PROGRESS — auth provider decision documented
 
 **Note**: Depends on Phase 14 (sync-on-load) completing first.
 
 | Task | Acceptance Criteria |
 |------|---------------------|
-| H1: Auth provider decision | `docs/decisions/auth-provider.md` exists with provider selection and tradeoffs |
+| H1: Auth provider decision | ✅ `docs/decisions/auth-provider.md` exists — Supabase anonymous auth recommended |
 | H2: Sign-in UI | Guest mode still works |
 | H3: Sync queue | Offline queue tests pass |
 
-**Status**: TODO
+**Note**: R2 secrets setup documented at `docs/R2-SECRETS-SETUP.md` — requires manual GitHub configuration.
 
 ---
 

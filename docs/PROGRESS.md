@@ -17,6 +17,9 @@
 | 11 | App Sync-on-Load (Phase 14) | ✅ Complete |
 | 12 | Persistence (Track G) | ✅ Complete |
 | 13 | Auth/Sync Guest Mode (Track H) | ✅ Complete |
+| 14 | E2E Smoke Test CI | ✅ Complete |
+| 15 | PWA Installability | ✅ Complete |
+| 16 | Real Scene Data Build | ✅ Complete |
 
 ---
 
@@ -95,7 +98,7 @@
 
 ## Known Limitations
 
-1. **`cycles.data` is placeholder (12 B)**: No real `.blend` scene data embedded
+1. **`cycles.data` is real scene data (119KB)**: Built via `make cycles-web` — real `.blend` embedded
 2. **No WebGPU/EEVEE rendering**: GPU backend not enabled
 3. **R2 GitHub secrets unconfigured**: `release.yml` can't upload to R2 automatically
 4. **Custom domain DNS unconfigured**: `blender-wasm.cyopsys.com` not pointed to Pages
@@ -110,8 +113,8 @@
 
 | # | Task | Priority | Status | Notes |
 |---|------|----------|--------|-------|
-| 1 | Embed real `.blend` in `cycles.data` | P0 | TODO | No real render output without this |
-| 2 | Wire `renderSampleScene()` to Cycles | P0 | TODO | Skeleton exists, needs real artifact loading |
+| 1 | Build Cycles with real scene data | P0 | ✅ DONE | `cycles.data` is 119KB (real `.blend` scene), built via `make cycles-web` |
+| 2 | Wire `renderSampleScene()` to Cycles | P0 | ✅ DONE | Skeleton wired to real cycles artifact at R2 |
 | 3 | Add E2E smoke test to CI | P1 | ✅ DONE | 10 tests now in CI, all passing |
 | 4 | Configure R2 GitHub secrets | P1 | TODO | Manual — `docs/R2-SECRETS-SETUP.md` |
 | 5 | Set up self-hosted runner for build | P1 | TODO | Manual — `docs/BUILDER-SETUP.md` |

@@ -79,7 +79,7 @@ var ENVIRONMENT_IS_PTHREAD = ENVIRONMENT_IS_WORKER && globalThis.name?.startsWit
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /tmp/tmp5qdby0u9.js
+// include: /tmp/tmp0nyl2yww.js
 if (!Module["expectedDataFileDownloads"]) Module["expectedDataFileDownloads"] = 0;
 
 Module["expectedDataFileDownloads"]++;
@@ -192,28 +192,32 @@ Module["expectedDataFileDownloads"]++;
       "filename": "/scenes/.gitkeep",
       "start": 0,
       "end": 12
+    }, {
+      "filename": "/scenes/scene.blend",
+      "start": 12,
+      "end": 121396
     } ],
-    "remote_package_size": 12
+    "remote_package_size": 121396
   });
 })();
 
-// end include: /tmp/tmp5qdby0u9.js
-// include: /tmp/tmpunvivkvc.js
+// end include: /tmp/tmp0nyl2yww.js
+// include: /tmp/tmpj9awrump.js
 // All the pre-js content up to here must remain later on, we need to run
 // it.
 if ((typeof ENVIRONMENT_IS_WASM_WORKER != "undefined" && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != "undefined" && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != "undefined" && ENVIRONMENT_IS_AUDIO_WORKLET)) Module["preRun"] = [];
 
 var necessaryPreJSTasks = Module["preRun"].slice();
 
-// end include: /tmp/tmpunvivkvc.js
-// include: /tmp/tmprefy2bwg.js
+// end include: /tmp/tmpj9awrump.js
+// include: /tmp/tmplw_k_lgt.js
 if (!Module["preRun"]) throw "Module.preRun should exist because file support used it; did a pre-js delete it?";
 
 necessaryPreJSTasks.forEach(task => {
   if (Module["preRun"].indexOf(task) < 0) throw "All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?";
 });
 
-// end include: /tmp/tmprefy2bwg.js
+// end include: /tmp/tmplw_k_lgt.js
 var programArgs = [];
 
 var thisProgram = "./this.program";
